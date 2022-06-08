@@ -23,12 +23,11 @@ $ npm install @badeball/cypress-configuration
 ```ts
 import { getConfiguration } from "@badeball/cypress-configuration";
 
-const { fixturesFolder, integrationFolder } = getConfiguration({
+const { fixturesFolder } = getConfiguration({
   cwd: process.cwd(),
   env: process.env,
-  argv: ["--config", "integrationFolder=cypress/custom-location"]
+  argv: ["--config", "fixturesFolder=cypress/custom-location"]
 });
 
-console.log(fixturesFolder); // => "cypress/fixtures"
-console.log(integrationFolder); // => "cypress/custom-location"
+console.log(fixturesFolder); // => "cypress/custom-location"
 ```

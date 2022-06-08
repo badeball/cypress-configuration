@@ -10,8 +10,6 @@ import { assertIsString } from "./assertions";
 
 import { ICypressConfiguration } from "./cypress-configuration";
 
-import { ensureIsAbsolute } from "./path-helpers";
-
 const MINIMATCH_OPTIONS = { dot: true, matchBase: true };
 
 export function resolveTestFiles(
@@ -19,22 +17,14 @@ export function resolveTestFiles(
 ): string[] {
   const {
     projectRoot,
-    integrationFolder,
     fixturesFolder,
     supportFile,
-    testFiles,
-    ignoreTestFiles,
+    specPattern,
+    excludeSpecPattern,
   } = configuration;
 
-  const testFilesPatterns = [testFiles].flat();
-  const ignoreTestFilesPatterns = [ignoreTestFiles].flat();
-
-  assertIsString(
-    integrationFolder,
-    `Expected "integrationFolder" to be a string, got ${util.inspect(
-      integrationFolder
-    )}`
-  );
+  const specPatterns = [specPattern].flat();
+  const excludeSpecPatterns = [excludeSpecPattern].flat();
 
   const globIgnore = [];
 
@@ -57,16 +47,16 @@ export function resolveTestFiles(
     sort: true,
     absolute: true,
     nodir: true,
-    cwd: ensureIsAbsolute(projectRoot, integrationFolder),
+    cwd: projectRoot,
     ignore: globIgnore.flat(),
   };
 
-  return testFilesPatterns
-    .flatMap((testFilesPattern) => glob.sync(testFilesPattern, globOptions))
+  return specPatterns
+    .flatMap((pattern) => glob.sync(pattern, globOptions))
     .filter((file) =>
-      ignoreTestFilesPatterns.every(
-        (ignoreTestFilesPattern) =>
-          !minimatch(file, ignoreTestFilesPattern, MINIMATCH_OPTIONS)
+      excludeSpecPatterns.every(
+        (pattern) =>
+          !minimatch(file, pattern, MINIMATCH_OPTIONS)
       )
     );
 }

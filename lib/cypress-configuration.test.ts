@@ -83,35 +83,34 @@ function example(
 
 describe("resolveConfiguration()", () => {
   // Default
-  example(resolveConfiguration, {}, "integrationFolder", "cypress/integration");
   example(resolveConfiguration, {}, "fixturesFolder", "cypress/fixtures");
   example(resolveConfiguration, {}, "supportFile", "cypress/support/index.js");
-  example(resolveConfiguration, {}, "testFiles", "**/*.*");
-  example(resolveConfiguration, {}, "ignoreTestFiles", "*.hot-update.js");
+  example(resolveConfiguration, {}, "specPattern", "cypress/e2e/**/*.cy.{js,jsx,ts,tsx}");
+  example(resolveConfiguration, {}, "excludeSpecPattern", "*.hot-update.js");
 
   // Simple CLI override
   example(
     resolveConfiguration,
     {
-      argv: ["--config", "integrationFolder=foo/bar"],
+      argv: ["--config", "fixturesFolder=foo/bar"],
     },
-    "integrationFolder",
+    "fixturesFolder",
     "foo/bar"
   );
   example(
     resolveConfiguration,
     {
-      argv: ["--config=integrationFolder=foo/bar"],
+      argv: ["--config=fixturesFolder=foo/bar"],
     },
-    "integrationFolder",
+    "fixturesFolder",
     "foo/bar"
   );
   example(
     resolveConfiguration,
     {
-      argv: ["-c", "integrationFolder=foo/bar"],
+      argv: ["-c", "fixturesFolder=foo/bar"],
     },
-    "integrationFolder",
+    "fixturesFolder",
     "foo/bar"
   );
 
@@ -119,25 +118,25 @@ describe("resolveConfiguration()", () => {
   example(
     resolveConfiguration,
     {
-      argv: ["--config", "foo=bar,integrationFolder=foo/bar"],
+      argv: ["--config", "foo=bar,fixturesFolder=foo/bar"],
     },
-    "integrationFolder",
+    "fixturesFolder",
     "foo/bar"
   );
   example(
     resolveConfiguration,
     {
-      argv: ["--config=foo=bar,integrationFolder=foo/bar"],
+      argv: ["--config=foo=bar,fixturesFolder=foo/bar"],
     },
-    "integrationFolder",
+    "fixturesFolder",
     "foo/bar"
   );
   example(
     resolveConfiguration,
     {
-      argv: ["-c", "foo=bar,integrationFolder=foo/bar"],
+      argv: ["-c", "foo=bar,fixturesFolder=foo/bar"],
     },
-    "integrationFolder",
+    "fixturesFolder",
     "foo/bar"
   );
 
@@ -145,25 +144,25 @@ describe("resolveConfiguration()", () => {
   example(
     resolveConfiguration,
     {
-      argv: ["--config", "integrationFolder=foo/bar,foo=bar"],
+      argv: ["--config", "fixturesFolder=foo/bar,foo=bar"],
     },
-    "integrationFolder",
+    "fixturesFolder",
     "foo/bar"
   );
   example(
     resolveConfiguration,
     {
-      argv: ["--config=integrationFolder=foo/bar,foo=bar"],
+      argv: ["--config=fixturesFolder=foo/bar,foo=bar"],
     },
-    "integrationFolder",
+    "fixturesFolder",
     "foo/bar"
   );
   example(
     resolveConfiguration,
     {
-      argv: ["-c", "integrationFolder=foo/bar,foo=bar"],
+      argv: ["-c", "fixturesFolder=foo/bar,foo=bar"],
     },
-    "integrationFolder",
+    "fixturesFolder",
     "foo/bar"
   );
 
@@ -173,83 +172,83 @@ describe("resolveConfiguration()", () => {
     {
       argv: [
         "--config",
-        "integrationFolder=baz",
+        "fixturesFolder=baz",
         "--config",
-        "integrationFolder=foo/bar",
+        "fixturesFolder=foo/bar",
       ],
     },
-    "integrationFolder",
+    "fixturesFolder",
     "foo/bar"
   );
   example(
     resolveConfiguration,
     {
       argv: [
-        "--config=integrationFolder=baz",
-        "--config=integrationFolder=foo/bar",
+        "--config=fixturesFolder=baz",
+        "--config=fixturesFolder=foo/bar",
       ],
     },
-    "integrationFolder",
+    "fixturesFolder",
     "foo/bar"
   );
   example(
     resolveConfiguration,
     {
-      argv: ["-c", "integrationFolder=baz", "-c", "integrationFolder=foo/bar"],
+      argv: ["-c", "fixturesFolder=baz", "-c", "fixturesFolder=foo/bar"],
     },
-    "integrationFolder",
+    "fixturesFolder",
     "foo/bar"
   );
 
   const envTestMatrix: { env: Record<string, string>; expected: string }[] = [
     {
       env: {
-        CYPRESS_integrationFolder: "foo/bar",
+        CYPRESS_fixturesFolder: "foo/bar",
       },
       expected: "foo/bar",
     },
     {
       env: {
-        cypress_integrationFolder: "foo/bar",
+        cypress_fixturesFolder: "foo/bar",
       },
       expected: "foo/bar",
     },
     {
       env: {
-        CYPRESS_integration_folder: "foo/bar",
+        CYPRESS_fixtures_folder: "foo/bar",
       },
       expected: "foo/bar",
     },
     {
       env: {
-        cypress_integration_folder: "foo/bar",
+        cypress_fixtures_folder: "foo/bar",
       },
       expected: "foo/bar",
     },
     {
       env: {
-        CYPRESS_INTEGRATION_FOLDER: "foo/bar",
+        CYPRESS_FIXTURES_FOLDER: "foo/bar",
       },
       expected: "foo/bar",
     },
     {
       env: {
-        cypress_INTEGRATION_FOLDER: "foo/bar",
+        cypress_FIXTURES_FOLDER: "foo/bar",
       },
       expected: "foo/bar",
     },
     // Erroneous camelcase
     {
       env: {
-        CYPRESS_integrationfolder: "foo/bar",
+        CYPRESS_fixturesfolder: "foo/bar",
       },
-      expected: "cypress/integration",
+      expected: "cypress/fixtures",
     },
     {
       env: {
-        cypress_integrationfolder: "foo/bar",
+        cypress_fixturesfolder: "foo/bar",
       },
-      expected: "cypress/integration",
+      expected: "cypress/fixtures",
     },
   ];
 
@@ -259,7 +258,7 @@ describe("resolveConfiguration()", () => {
       {
         env,
       },
-      "integrationFolder",
+      "fixturesFolder",
       expected
     );
   }
@@ -268,9 +267,9 @@ describe("resolveConfiguration()", () => {
   example(
     resolveConfiguration,
     {
-      cypressConfig: { integrationFolder: "foo/bar" },
+      cypressConfig: { fixturesFolder: "foo/bar" },
     },
-    "integrationFolder",
+    "fixturesFolder",
     "foo/bar"
   );
 
@@ -279,30 +278,30 @@ describe("resolveConfiguration()", () => {
     resolveConfiguration,
     {
       argv: ["--config-file", "foo.json"],
-      cypressConfig: { integrationFolder: "foo/bar" },
+      cypressConfig: { fixturesFolder: "foo/bar" },
       cypressConfigPath: "foo.json",
     },
-    "integrationFolder",
+    "fixturesFolder",
     "foo/bar"
   );
   example(
     resolveConfiguration,
     {
       argv: ["--config-file=foo.json"],
-      cypressConfig: { integrationFolder: "foo/bar" },
+      cypressConfig: { fixturesFolder: "foo/bar" },
       cypressConfigPath: "foo.json",
     },
-    "integrationFolder",
+    "fixturesFolder",
     "foo/bar"
   );
   example(
     resolveConfiguration,
     {
       argv: ["-C", "foo.json"],
-      cypressConfig: { integrationFolder: "foo/bar" },
+      cypressConfig: { fixturesFolder: "foo/bar" },
       cypressConfigPath: "foo.json",
     },
-    "integrationFolder",
+    "fixturesFolder",
     "foo/bar"
   );
 
@@ -311,30 +310,30 @@ describe("resolveConfiguration()", () => {
     resolveConfiguration,
     {
       argv: ["--project", "foo"],
-      cypressConfig: { integrationFolder: "foo/bar" },
+      cypressConfig: { fixturesFolder: "foo/bar" },
       cypressProjectPath: "foo",
     },
-    "integrationFolder",
+    "fixturesFolder",
     "foo/bar"
   );
   example(
     resolveConfiguration,
     {
       argv: ["--project=foo"],
-      cypressConfig: { integrationFolder: "foo/bar" },
+      cypressConfig: { fixturesFolder: "foo/bar" },
       cypressProjectPath: "foo",
     },
-    "integrationFolder",
+    "fixturesFolder",
     "foo/bar"
   );
   example(
     resolveConfiguration,
     {
       argv: ["-P", "foo"],
-      cypressConfig: { integrationFolder: "foo/bar" },
+      cypressConfig: { fixturesFolder: "foo/bar" },
       cypressProjectPath: "foo",
     },
-    "integrationFolder",
+    "fixturesFolder",
     "foo/bar"
   );
 
@@ -343,33 +342,33 @@ describe("resolveConfiguration()", () => {
     resolveConfiguration,
     {
       argv: ["--config-file", "foo.json", "--project", "foo"],
-      cypressConfig: { integrationFolder: "foo/bar" },
+      cypressConfig: { fixturesFolder: "foo/bar" },
       cypressConfigPath: "foo.json",
       cypressProjectPath: "foo",
     },
-    "integrationFolder",
+    "fixturesFolder",
     "foo/bar"
   );
   example(
     resolveConfiguration,
     {
       argv: ["--config-file=foo.json", "--project", "foo"],
-      cypressConfig: { integrationFolder: "foo/bar" },
+      cypressConfig: { fixturesFolder: "foo/bar" },
       cypressConfigPath: "foo.json",
       cypressProjectPath: "foo",
     },
-    "integrationFolder",
+    "fixturesFolder",
     "foo/bar"
   );
   example(
     resolveConfiguration,
     {
       argv: ["-C", "foo.json", "--project", "foo"],
-      cypressConfig: { integrationFolder: "foo/bar" },
+      cypressConfig: { fixturesFolder: "foo/bar" },
       cypressConfigPath: "foo.json",
       cypressProjectPath: "foo",
     },
-    "integrationFolder",
+    "fixturesFolder",
     "foo/bar"
   );
 });

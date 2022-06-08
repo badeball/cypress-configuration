@@ -27,11 +27,10 @@ function isStringEntry(entry: [any, any]): entry is [string, string] {
  */
 export interface ICypressConfiguration {
   projectRoot: string;
-  integrationFolder: string;
   fixturesFolder: string | false;
   supportFile: string | false;
-  testFiles: string | string[];
-  ignoreTestFiles: string | string[];
+  specPattern: string | string[];
+  excludeSpecPattern: string | string[];
   env: Record<string, any>;
 }
 
@@ -44,15 +43,6 @@ function validateConfigurationEntry(
       if (!isString(value)) {
         throw new Error(
           `Expected a string (projectRoot), but got ${util.inspect(value)}`
-        );
-      }
-      return { [key]: value };
-    case "integrationFolder":
-      if (!isString(value)) {
-        throw new Error(
-          `Expected a string (integrationFolder), but got ${util.inspect(
-            value
-          )}`
         );
       }
       return { [key]: value };
@@ -74,19 +64,19 @@ function validateConfigurationEntry(
         );
       }
       return { [key]: value };
-    case "testFiles":
+    case "specPattern":
       if (!isStringOrStringArray(value)) {
         throw new Error(
-          `Expected a string or array of strings (testFiles), but got ${util.inspect(
+          `Expected a string or array of strings (specPattern), but got ${util.inspect(
             value
           )}`
         );
       }
       return { [key]: value };
-    case "ignoreTestFiles":
+    case "excludeSpecPattern":
       if (!isStringOrStringArray(value)) {
         throw new Error(
-          `Expected a string or array of strings (ignoreTestFiles), but got ${util.inspect(
+          `Expected a string or array of strings (excludeSpecPattern), but got ${util.inspect(
             value
           )}`
         );
@@ -270,11 +260,10 @@ export function resolveConfiguration(options: {
   const configuration = Object.assign(
     {
       projectRoot: resolveProjectPath(options),
-      integrationFolder: "cypress/integration",
       fixturesFolder: "cypress/fixtures",
       supportFile: "cypress/support/index.js",
-      testFiles: "**/*.*",
-      ignoreTestFiles: "*.hot-update.js",
+      specPattern: "cypress/e2e/**/*.cy.{js,jsx,ts,tsx}",
+      excludeSpecPattern: "*.hot-update.js",
     },
     configOrigin,
     envOrigin,
