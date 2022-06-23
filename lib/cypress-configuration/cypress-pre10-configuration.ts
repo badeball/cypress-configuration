@@ -20,9 +20,19 @@ import {
 
 import { ensureIsAbsolute } from "../path-helpers";
 
+import {
+  combine,
+  traverseArgvMatching,
+  toCamelCase,
+  findArgumentValue,
+  resolveProjectPath,
+} from "./helpers";
+
 function isStringEntry(entry: [any, any]): entry is [string, string] {
   return typeof entry[0] === "string" && typeof entry[1] === "string";
 }
+
+export const CONFIG_FILE_NAME = "cypress.json";
 
 /**
  * This is obviously a non-exhaustive list.
@@ -145,82 +155,6 @@ function parseJsonFile(filepath: string) {
   }
 }
 
-function findLastIndex<T>(
-  collection: ArrayLike<T>,
-  predicate: (value: T) => boolean,
-  beforeIndex = collection.length
-): number {
-  for (let i = beforeIndex - 1; i >= 0; --i) {
-    if (predicate(collection[i])) {
-      return i;
-    }
-  }
-
-  return -1;
-}
-
-function* traverseArgvMatching(
-  argv: string[],
-  name: string,
-  allowEqual: boolean
-) {
-  let beforeIndex = argv.length,
-    matchingIndex;
-
-  while (
-    (matchingIndex = findLastIndex(
-      argv,
-      (arg) => arg.startsWith(name),
-      beforeIndex
-    )) !== -1
-  ) {
-    if (argv[matchingIndex] === name) {
-      if (argv.length - 1 === matchingIndex) {
-        debug(`'${name}' argument missing`);
-      } else {
-        yield argv[matchingIndex + 1];
-      }
-    } else if (allowEqual && argv[matchingIndex][name.length] === "=") {
-      yield argv[matchingIndex].slice(name.length + 1);
-    }
-
-    beforeIndex = matchingIndex;
-  }
-}
-
-function* combine<T>(...generators: Generator<T, unknown, unknown>[]) {
-  for (const generator of generators) {
-    yield* generator;
-  }
-}
-
-function findArgumentValue(
-  argv: string[],
-  name: string,
-  allowEqual: boolean
-): string | undefined {
-  for (const value of traverseArgvMatching(argv, name, allowEqual)) {
-    return value;
-  }
-}
-
-function toSnakeCase(value: string) {
-  return value.replace(/[A-Z]/g, (letter) => `_${letter.toLowerCase()}`);
-}
-
-function capitalize(word: string) {
-  return word.toLowerCase().replace(/\b\w/g, (l) => l.toUpperCase());
-}
-
-function toCamelCase(value: string) {
-  return value
-    .split("_")
-    .map((word, index) =>
-      index === 0 ? word.toLocaleLowerCase() : capitalize(word)
-    )
-    .join("");
-}
-
 export function resolvePre10Configuration(options: {
   argv: string[];
   env: NodeJS.ProcessEnv;
@@ -321,7 +255,11 @@ export function resolvePre10Configuration(options: {
 
   return {
     ...configuration,
-    env: resolvePre10Environment({ ...options, projectPath, configuration }),
+    env: resolvePre10Environment({
+      ...options,
+      projectPath,
+      configOrigin: configuration.env,
+    }),
   };
 }
 
@@ -330,13 +268,13 @@ export function resolvePre10Environment(options: {
   env: NodeJS.ProcessEnv;
   cwd: string;
   projectPath: string;
-  configuration: ICypressPre10Configuration;
+  configOrigin: Record<string, any>;
 }): Record<string, any> {
   debug(
     `attempting to resolve Cypress environment using ${util.inspect(options)}`
   );
 
-  const { argv, env, projectPath, configuration } = options;
+  const { argv, env, projectPath, configOrigin } = options;
 
   const envEntries = Array.from(
     combine(
@@ -382,8 +320,6 @@ export function resolvePre10Environment(options: {
       })
   );
 
-  let configOrigin: Record<string, any> = configuration.env;
-
   const cypressEnvironmentFilePath = path.join(projectPath, "cypress.env.json");
 
   let cypressEnvOrigin: Record<string, any> = {};
@@ -415,22 +351,8 @@ function resolveConfigurationFile(options: { argv: string[] }): string {
   return (
     findArgumentValue(argv, "--config-file", true) ||
     findArgumentValue(argv, "-C", false) ||
-    "cypress.json"
+    CONFIG_FILE_NAME
   );
-}
-
-function resolveProjectPath(options: { argv: string[]; cwd: string }): string {
-  const { argv, cwd } = options;
-
-  const customProjectPath =
-    findArgumentValue(argv, "--project", true) ||
-    findArgumentValue(argv, "-P", false);
-
-  if (customProjectPath) {
-    return ensureIsAbsolute(cwd, customProjectPath);
-  } else {
-    return cwd;
-  }
 }
 
 const MINIMATCH_OPTIONS = { dot: true, matchBase: true };
@@ -482,7 +404,7 @@ export function resolvePre10TestFiles(
     ignore: globIgnore.flat(),
   };
 
-  return testFilesPatterns
+  const resolvedTestFiles = testFilesPatterns
     .flatMap((testFilesPattern) => glob.sync(testFilesPattern, globOptions))
     .filter((file) =>
       ignoreTestFilesPatterns.every(
@@ -490,4 +412,8 @@ export function resolvePre10TestFiles(
           !minimatch(file, ignoreTestFilesPattern, MINIMATCH_OPTIONS)
       )
     );
+
+  debug(`resolved test files ${util.inspect(resolvedTestFiles)}`);
+
+  return resolvedTestFiles;
 }

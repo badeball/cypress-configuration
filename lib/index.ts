@@ -4,4 +4,8 @@ export {
   ICypressConfiguration,
   ICypressPre10Configuration,
   ICypressPost10Configuration,
+  CypressConfigurationError,
+  MissingConfigurationFileError,
+  MultipleConfigurationFilesError,
+  UnrecognizedConfigurationFileError,
 } from "./cypress-configuration";
