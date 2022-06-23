@@ -30,14 +30,18 @@
   },
   "dependencies": {
     "debug": "^4.3.2",
+    "esbuild": "^0.11.12",
     "glob": "^7.1.6",
-    "minimatch": "^3.0.4"
+    "minimatch": "^3.0.4",
+    "node-hook": "^1.0.0"
   },
   "devDependencies": {
+    "@babel/parser": "^7.18.8",
+    "@babel/types": "^7.18.8",
     "@types/debug": "^4.1.7",
     "@types/glob": "^7.1.4",
     "@types/mocha": "^9.0.0",
-    "esbuild": "^0.11.12",
+    "@types/node-hook": "^1.0.1",
     "mocha": "^8.2.0",
     "prettier": "^2.2.1",
     "ts-node": "^10.3.0",

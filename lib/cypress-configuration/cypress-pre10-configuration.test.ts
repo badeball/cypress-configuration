@@ -81,7 +81,7 @@ function example(
   });
 }
 
-describe("resolveConfiguration()", () => {
+describe("resolvePre10Configuration()", () => {
   // Default
   example(
     resolvePre10Configuration,

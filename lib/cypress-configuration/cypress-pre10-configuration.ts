@@ -465,7 +465,7 @@ export function resolvePre10TestFiles(
     ignore: globIgnore.flat(),
   };
 
-  return testFilesPatterns
+  const resolvedTestFiles = testFilesPatterns
     .flatMap((testFilesPattern) => glob.sync(testFilesPattern, globOptions))
     .filter((file) =>
       ignoreTestFilesPatterns.every(
@@ -473,4 +473,8 @@ export function resolvePre10TestFiles(
           !minimatch(file, ignoreTestFilesPattern, MINIMATCH_OPTIONS)
       )
     );
+
+  debug(`resolved test files ${util.inspect(resolvedTestFiles)}`);
+
+  return resolvedTestFiles;
 }
