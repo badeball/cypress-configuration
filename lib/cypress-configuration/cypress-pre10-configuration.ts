@@ -234,10 +234,7 @@ export function resolvePre10Configuration(options: {
       .map<[string, string]>((entry) => {
         const match = entry[0].match(envPrefixExpr);
 
-        assert(
-          match,
-          "cypress-cucumber-preprocessor: expected match after test, this is likely a bug."
-        );
+        assert(match, "expected match after test");
 
         return [assertAndReturn(match[1]), entry[1]];
       })
@@ -341,10 +338,7 @@ export function resolvePre10Environment(options: {
       .map<[string, string]>((entry) => {
         const match = entry[0].match(envPrefixExpr);
 
-        assert(
-          match,
-          "cypress-cucumber-preprocessor: expected match after test"
-        );
+        assert(match, "expected match after test");
 
         return [assertAndReturn(match[1]), entry[1]];
       })
