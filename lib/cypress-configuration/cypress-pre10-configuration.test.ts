@@ -37,7 +37,7 @@ function example(
   attribute: string,
   expected: any
 ) {
-  it(`should return ${attribute} = "${expected}" for ${util.inspect(
+  it(`should return ${attribute} = ${util.inspect(expected)} for ${util.inspect(
     options
   )}}`, () => {
     const {
@@ -77,7 +77,7 @@ function example(
       ...options,
     });
 
-    assert.strictEqual(actual[attribute], expected);
+    assert.deepStrictEqual(actual[attribute], expected);
   });
 }
 
@@ -211,67 +211,69 @@ describe("resolveConfiguration()", () => {
     "foo/bar"
   );
 
-  const envTestMatrix: { env: Record<string, string>; expected: string }[] = [
-    {
-      env: {
-        CYPRESS_integrationFolder: "foo/bar",
-      },
-      expected: "foo/bar",
-    },
-    {
-      env: {
-        cypress_integrationFolder: "foo/bar",
-      },
-      expected: "foo/bar",
-    },
-    {
-      env: {
-        CYPRESS_integration_folder: "foo/bar",
-      },
-      expected: "foo/bar",
-    },
-    {
-      env: {
-        cypress_integration_folder: "foo/bar",
-      },
-      expected: "foo/bar",
-    },
-    {
-      env: {
-        CYPRESS_INTEGRATION_FOLDER: "foo/bar",
-      },
-      expected: "foo/bar",
-    },
-    {
-      env: {
-        cypress_INTEGRATION_FOLDER: "foo/bar",
-      },
-      expected: "foo/bar",
-    },
-    // Erroneous camelcase
-    {
-      env: {
-        CYPRESS_integrationfolder: "foo/bar",
-      },
-      expected: "cypress/integration",
-    },
-    {
-      env: {
-        cypress_integrationfolder: "foo/bar",
-      },
-      expected: "cypress/integration",
-    },
-  ];
-
-  for (let { env, expected } of envTestMatrix) {
-    example(
-      resolvePre10Configuration,
+  {
+    const envTestMatrix: { env: Record<string, string>; expected: string }[] = [
       {
-        env,
+        env: {
+          CYPRESS_integrationFolder: "foo/bar",
+        },
+        expected: "foo/bar",
       },
-      "integrationFolder",
-      expected
-    );
+      {
+        env: {
+          cypress_integrationFolder: "foo/bar",
+        },
+        expected: "foo/bar",
+      },
+      {
+        env: {
+          CYPRESS_integration_folder: "foo/bar",
+        },
+        expected: "foo/bar",
+      },
+      {
+        env: {
+          cypress_integration_folder: "foo/bar",
+        },
+        expected: "foo/bar",
+      },
+      {
+        env: {
+          CYPRESS_INTEGRATION_FOLDER: "foo/bar",
+        },
+        expected: "foo/bar",
+      },
+      {
+        env: {
+          cypress_INTEGRATION_FOLDER: "foo/bar",
+        },
+        expected: "foo/bar",
+      },
+      // Erroneous camelcase
+      {
+        env: {
+          CYPRESS_integrationfolder: "foo/bar",
+        },
+        expected: "cypress/integration",
+      },
+      {
+        env: {
+          cypress_integrationfolder: "foo/bar",
+        },
+        expected: "cypress/integration",
+      },
+    ];
+
+    for (let { env, expected } of envTestMatrix) {
+      example(
+        resolvePre10Configuration,
+        {
+          env,
+        },
+        "integrationFolder",
+        expected
+      );
+    }
   }
 
   // Override with cypress.json
@@ -382,313 +384,315 @@ describe("resolveConfiguration()", () => {
     "integrationFolder",
     "foo/bar"
   );
-});
 
-describe("resolveEnvironment()", () => {
-  // Default
-  example(resolvePre10Environment, {}, "FOO", undefined);
+  /**
+   * Environment part starts here.
+   */
+  example(resolvePre10Configuration, {}, "env", {});
 
   // Simple CLI override
   example(
-    resolvePre10Environment,
+    resolvePre10Configuration,
     {
       argv: ["--env", "FOO=foo"],
     },
-    "FOO",
-    "foo"
+    "env",
+    { FOO: "foo" }
   );
   example(
-    resolvePre10Environment,
+    resolvePre10Configuration,
     {
       argv: ["--env=FOO=foo"],
     },
-    "FOO",
-    "foo"
+    "env",
+    { FOO: "foo" }
   );
   example(
-    resolvePre10Environment,
+    resolvePre10Configuration,
     {
       argv: ["-e", "FOO=foo"],
     },
-    "FOO",
-    "foo"
+    "env",
+    { FOO: "foo" }
   );
 
   // CLI override with preceding, comma-delimited configuration
   example(
-    resolvePre10Environment,
+    resolvePre10Configuration,
     {
       argv: ["--env", "BAR=bar,FOO=foo"],
     },
-    "FOO",
-    "foo"
+    "env",
+    { FOO: "foo", BAR: "bar" }
   );
   example(
-    resolvePre10Environment,
+    resolvePre10Configuration,
     {
       argv: ["--env=BAR=bar,FOO=foo"],
     },
-    "FOO",
-    "foo"
+    "env",
+    { FOO: "foo", BAR: "bar" }
   );
   example(
-    resolvePre10Environment,
+    resolvePre10Configuration,
     {
       argv: ["-e", "BAR=bar,FOO=foo"],
     },
-    "FOO",
-    "foo"
+    "env",
+    { FOO: "foo", BAR: "bar" }
   );
 
   // CLI override with succeeding, comma-delimited configuration
   example(
-    resolvePre10Environment,
+    resolvePre10Configuration,
     {
       argv: ["--env", "FOO=foo,BAR=bar"],
     },
-    "FOO",
-    "foo"
+    "env",
+    { FOO: "foo", BAR: "bar" }
   );
   example(
-    resolvePre10Environment,
+    resolvePre10Configuration,
     {
       argv: ["--env=FOO=foo,BAR=bar"],
     },
-    "FOO",
-    "foo"
+    "env",
+    { FOO: "foo", BAR: "bar" }
   );
   example(
-    resolvePre10Environment,
+    resolvePre10Configuration,
     {
       argv: ["-e", "FOO=foo,BAR=bar"],
     },
-    "FOO",
-    "foo"
+    "env",
+    { FOO: "foo", BAR: "bar" }
   );
 
   // CLI override with last match taking precedence
   example(
-    resolvePre10Environment,
+    resolvePre10Configuration,
     {
       argv: ["--env", "FOO=baz", "--env", "FOO=foo"],
     },
-    "FOO",
-    "foo"
+    "env",
+    { FOO: "foo" }
   );
   example(
-    resolvePre10Environment,
+    resolvePre10Configuration,
     {
       argv: ["--env=FOO=baz", "--env=FOO=foo"],
     },
-    "FOO",
-    "foo"
+    "env",
+    { FOO: "foo" }
   );
   example(
-    resolvePre10Environment,
+    resolvePre10Configuration,
     {
       argv: ["-e", "FOO=baz", "-e", "FOO=foo"],
     },
-    "FOO",
-    "foo"
+    "env",
+    { FOO: "foo" }
   );
   example(
-    resolvePre10Environment,
+    resolvePre10Configuration,
     {
-      argv: ["--env", "FOO=foo", "--env", "BAR=BAR"],
+      argv: ["--env", "FOO=foo", "--env", "BAR=bar"],
     },
-    "FOO",
-    undefined
+    "env",
+    { BAR: "bar" }
   );
 
-  const envTestMatrix: {
-    env: Record<string, string>;
-    expected: string | undefined;
-  }[] = [
-    {
-      env: {
-        CYPRESS_FOO: "foo",
-      },
-      expected: "foo",
-    },
-    {
-      env: {
-        cypress_FOO: "foo",
-      },
-      expected: "foo",
-    },
-    {
-      env: {
-        CYPRESS_foo: "foo",
-      },
-      expected: undefined,
-    },
-    {
-      env: {
-        cypress_foo: "foo",
-      },
-      expected: undefined,
-    },
-  ];
-
-  for (let { env, expected } of envTestMatrix) {
-    example(
-      resolvePre10Environment,
+  {
+    const envTestMatrix: {
+      env: Record<string, string>;
+      expected: Record<string, string>;
+    }[] = [
       {
-        env,
+        env: {
+          CYPRESS_FOO: "foo",
+        },
+        expected: { FOO: "foo" },
       },
-      "FOO",
-      expected
-    );
+      {
+        env: {
+          cypress_FOO: "foo",
+        },
+        expected: { FOO: "foo" },
+      },
+      {
+        env: {
+          CYPRESS_foo: "foo",
+        },
+        expected: { foo: "foo" },
+      },
+      {
+        env: {
+          cypress_foo: "foo",
+        },
+        expected: { foo: "foo" },
+      },
+    ];
+
+    for (let { env, expected } of envTestMatrix) {
+      example(
+        resolvePre10Configuration,
+        {
+          env,
+        },
+        "env",
+        expected
+      );
+    }
   }
 
   // Override with cypress.json
   example(
-    resolvePre10Environment,
+    resolvePre10Configuration,
     {
       cypressConfig: { env: { FOO: "foo" } },
     },
-    "FOO",
-    "foo"
+    "env",
+    { FOO: "foo" }
   );
 
   // Override with cypress.json in custom location
   example(
-    resolvePre10Environment,
+    resolvePre10Configuration,
     {
       argv: ["--config-file", "foo.json"],
       cypressConfig: { env: { FOO: "foo" } },
       cypressConfigPath: "foo.json",
     },
-    "FOO",
-    "foo"
+    "env",
+    { FOO: "foo" }
   );
   example(
-    resolvePre10Environment,
+    resolvePre10Configuration,
     {
       argv: ["--config-file=foo.json"],
       cypressConfig: { env: { FOO: "foo" } },
       cypressConfigPath: "foo.json",
     },
-    "FOO",
-    "foo"
+    "env",
+    { FOO: "foo" }
   );
   example(
-    resolvePre10Environment,
+    resolvePre10Configuration,
     {
       argv: ["-C", "foo.json"],
       cypressConfig: { env: { FOO: "foo" } },
       cypressConfigPath: "foo.json",
     },
-    "FOO",
-    "foo"
+    "env",
+    { FOO: "foo" }
   );
 
   // Override with cypress.env.json
   example(
-    resolvePre10Environment,
+    resolvePre10Configuration,
     {
       cypressEnvConfig: { FOO: "foo" },
     },
-    "FOO",
-    "foo"
+    "env",
+    { FOO: "foo" }
   );
 
   // Override with cypress.json & custom project path.
   example(
-    resolvePre10Environment,
+    resolvePre10Configuration,
     {
       argv: ["--project", "foo"],
       cypressConfig: { env: { FOO: "foo" } },
       cypressProjectPath: "foo",
     },
-    "FOO",
-    "foo"
+    "env",
+    { FOO: "foo" }
   );
   example(
-    resolvePre10Environment,
+    resolvePre10Configuration,
     {
       argv: ["--project=foo"],
       cypressConfig: { env: { FOO: "foo" } },
       cypressProjectPath: "foo",
     },
-    "FOO",
-    "foo"
+    "env",
+    { FOO: "foo" }
   );
   example(
-    resolvePre10Environment,
+    resolvePre10Configuration,
     {
       argv: ["-P", "foo"],
       cypressConfig: { env: { FOO: "foo" } },
       cypressProjectPath: "foo",
     },
-    "FOO",
-    "foo"
+    "env",
+    { FOO: "foo" }
   );
 
   // Override with cypress.json in custom location & custom project path.
   example(
-    resolvePre10Environment,
+    resolvePre10Configuration,
     {
       argv: ["--project", "foo", "--config-file", "foo.json"],
       cypressConfig: { env: { FOO: "foo" } },
       cypressConfigPath: "foo.json",
       cypressProjectPath: "foo",
     },
-    "FOO",
-    "foo"
+    "env",
+    { FOO: "foo" }
   );
   example(
-    resolvePre10Environment,
+    resolvePre10Configuration,
     {
       argv: ["--project=foo", "--config-file", "foo.json"],
       cypressConfig: { env: { FOO: "foo" } },
       cypressConfigPath: "foo.json",
       cypressProjectPath: "foo",
     },
-    "FOO",
-    "foo"
+    "env",
+    { FOO: "foo" }
   );
   example(
-    resolvePre10Environment,
+    resolvePre10Configuration,
     {
       argv: ["-P", "foo", "--config-file", "foo.json"],
       cypressConfig: { env: { FOO: "foo" } },
       cypressConfigPath: "foo.json",
       cypressProjectPath: "foo",
     },
-    "FOO",
-    "foo"
+    "env",
+    { FOO: "foo" }
   );
 
   // Override with cypress.env.json & custom project path.
   example(
-    resolvePre10Environment,
+    resolvePre10Configuration,
     {
       argv: ["--project", "foo"],
       cypressEnvConfig: { FOO: "foo" },
       cypressProjectPath: "foo",
     },
-    "FOO",
-    "foo"
+    "env",
+    { FOO: "foo" }
   );
   example(
-    resolvePre10Environment,
+    resolvePre10Configuration,
     {
       argv: ["--project=foo"],
       cypressEnvConfig: { FOO: "foo" },
       cypressProjectPath: "foo",
     },
-    "FOO",
-    "foo"
+    "env",
+    { FOO: "foo" }
   );
   example(
-    resolvePre10Environment,
+    resolvePre10Configuration,
     {
       argv: ["-P", "foo"],
       cypressEnvConfig: { FOO: "foo" },
       cypressProjectPath: "foo",
     },
-    "FOO",
-    "foo"
+    "env",
+    { FOO: "foo" }
   );
 });

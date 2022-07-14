@@ -39,6 +39,32 @@ export interface ICypressPre10Configuration {
   env: Record<string, any>;
 }
 
+function isObject(o: any) {
+  return Object.prototype.toString.call(o) === "[object Object]";
+}
+
+export function isPlainObject(o: any): o is Record<string, any> {
+  var ctor, prot;
+
+  if (isObject(o) === false) return false;
+
+  // If has modified constructor
+  ctor = o.constructor;
+  if (ctor === undefined) return true;
+
+  // If has modified prototype
+  prot = ctor.prototype;
+  if (isObject(prot) === false) return false;
+
+  // If constructor does not have an Object-specific method
+  if (prot.hasOwnProperty("isPrototypeOf") === false) {
+    return false;
+  }
+
+  // Most likely a plain Object
+  return true;
+}
+
 function validateConfigurationEntry(
   key: string,
   value: unknown
@@ -96,6 +122,14 @@ function validateConfigurationEntry(
         );
       }
       return { [key]: value };
+    case "env": {
+      if (!isPlainObject(value)) {
+        throw new Error(
+          `Expected a plain object (env), but got ${util.inspect(value)}`
+        );
+      }
+      return { [key]: value };
+    }
     default:
       return {};
   }
@@ -268,7 +302,7 @@ export function resolvePre10Configuration(options: {
     );
   }
 
-  const configuration = Object.assign(
+  const configuration: ICypressPre10Configuration = Object.assign(
     {
       projectRoot: resolveProjectPath(options),
       integrationFolder: "cypress/integration",
@@ -276,6 +310,7 @@ export function resolvePre10Configuration(options: {
       supportFile: "cypress/support/index.js",
       testFiles: "**/*.*",
       ignoreTestFiles: "*.hot-update.js",
+      env: {},
     },
     configOrigin,
     envOrigin,
@@ -284,21 +319,24 @@ export function resolvePre10Configuration(options: {
 
   debug(`resolved configuration of ${util.inspect(configuration)}`);
 
-  return { ...configuration, env: resolvePre10Environment(options) };
+  return {
+    ...configuration,
+    env: resolvePre10Environment({ ...options, projectPath, configuration }),
+  };
 }
 
 export function resolvePre10Environment(options: {
   argv: string[];
   env: NodeJS.ProcessEnv;
   cwd: string;
+  projectPath: string;
+  configuration: ICypressPre10Configuration;
 }): Record<string, any> {
   debug(
     `attempting to resolve Cypress environment using ${util.inspect(options)}`
   );
 
-  const { argv, env } = options;
-
-  const projectPath = resolveProjectPath(options);
+  const { argv, env, projectPath, configuration } = options;
 
   const envEntries = Array.from(
     combine(
@@ -344,22 +382,7 @@ export function resolvePre10Environment(options: {
       })
   );
 
-  const cypressConfigPath = ensureIsAbsolute(
-    projectPath,
-    resolveConfigurationFile(options)
-  );
-
-  let configOrigin: Record<string, any> = {};
-
-  if (fs.existsSync(cypressConfigPath)) {
-    const content = fs.readFileSync(cypressConfigPath).toString("utf8");
-
-    const cypressConfig = JSON.parse(content);
-
-    if (cypressConfig.env) {
-      configOrigin = cypressConfig.env;
-    }
-  }
+  let configOrigin: Record<string, any> = configuration.env;
 
   const cypressEnvironmentFilePath = path.join(projectPath, "cypress.env.json");
 

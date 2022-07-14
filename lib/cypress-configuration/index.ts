@@ -24,14 +24,6 @@ export function resolveConfiguration(options: {
   return resolvePre10Configuration(options);
 }
 
-export function resolveEnvironment(options: {
-  argv: string[];
-  env: NodeJS.ProcessEnv;
-  cwd: string;
-}): Record<string, any> {
-  return resolvePre10Environment(options);
-}
-
 export function resolveTestFiles(
   configuration: ICypressConfiguration
 ): string[] {
