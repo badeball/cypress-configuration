@@ -15,7 +15,7 @@ function parseThatObject(
       property.value.type === "ObjectExpression"
     ) {
       return Object.fromEntries(
-        property.value.properties.reduce<[string, string][]>(
+        property.value.properties.reduce<[string, string | string[]][]>(
           (entries, property) => {
             if (
               property.type === "ObjectProperty" &&
@@ -24,6 +24,23 @@ function parseThatObject(
               if (property.key.name === "specPattern") {
                 if (property.value.type === "StringLiteral") {
                   return [...entries, ["specPattern", property.value.value]];
+                } else if (property.value.type === "ArrayExpression") {
+                  return [
+                    ...entries,
+                    [
+                      "specPattern",
+                      property.value.elements.map((element) => {
+                        if (element && element.type === "StringLiteral") {
+                          return element.value;
+                        } else {
+                          throw new Error(
+                            "Expected a string literal for specPattern.[], but got " +
+                              element?.type ?? "null"
+                          );
+                        }
+                      }),
+                    ],
+                  ];
                 } else {
                   throw new Error(
                     "Expected a string literal for specPattern, but got " +

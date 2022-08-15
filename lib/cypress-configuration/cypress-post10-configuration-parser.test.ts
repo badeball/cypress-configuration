@@ -20,6 +20,10 @@ describe("parsePost10Configuration()", () => {
     specPattern: "foo/bar",
   });
 
+  example("module.exports = { e2e: { specPattern: ['foo/bar'] } };", {
+    specPattern: ["foo/bar"],
+  });
+
   example(
     "module.exports = defineConfig({ e2e: { specPattern: 'foo/bar' } });",
     {
@@ -27,11 +31,29 @@ describe("parsePost10Configuration()", () => {
     }
   );
 
+  example(
+    "module.exports = defineConfig({ e2e: { specPattern: ['foo/bar'] } });",
+    {
+      specPattern: ["foo/bar"],
+    }
+  );
+
   example("export default { e2e: { specPattern: 'foo/bar' } };", {
     specPattern: "foo/bar",
+  });
+
+  example("export default { e2e: { specPattern: ['foo/bar'] } };", {
+    specPattern: ["foo/bar"],
   });
 
   example("export default defineConfig({ e2e: { specPattern: 'foo/bar' } });", {
     specPattern: "foo/bar",
   });
+
+  example(
+    "export default defineConfig({ e2e: { specPattern: ['foo/bar'] } });",
+    {
+      specPattern: ["foo/bar"],
+    }
+  );
 });
