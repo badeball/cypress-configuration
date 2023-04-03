@@ -293,7 +293,9 @@ export function resolvePost10TestFiles(
 
   specPatterns = [specPatterns].flat();
 
-  excludeSpecPatterns = [excludeSpecPatterns].flat();
+  excludeSpecPatterns = [excludeSpecPatterns]
+    .flat()
+    .concat("**/node_modules/**");
 
   const globOptions = {
     sort: true,
