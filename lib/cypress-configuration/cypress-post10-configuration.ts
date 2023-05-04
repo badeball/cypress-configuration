@@ -4,7 +4,7 @@ import path from "path";
 
 import util from "util";
 
-import glob from "glob";
+import glob, { IOptions } from "glob";
 
 import hook from "node-hook";
 
@@ -297,8 +297,7 @@ export function resolvePost10TestFiles(
     .flat()
     .concat("**/node_modules/**");
 
-  const globOptions = {
-    sort: true,
+  const globOptions: IOptions = {
     absolute: true,
     nodir: true,
     cwd: projectRoot,
