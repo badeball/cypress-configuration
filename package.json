@@ -12,14 +12,14 @@
     "cypress",
     "cypress-configuration"
   ],
-  "main": "lib/index.js",
-  "types": "lib/index.d.ts",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "files": [
-    "lib/**/*.js",
-    "lib/**/*.d.ts"
+    "dist/**/*.js",
+    "dist/**/*.d.ts"
   ],
   "scripts": {
-    "clean": "bash -O globstar -c 'rm -f lib/**/*.{js,d.ts}'",
+    "clean": "rm -rf dist",
     "build": "tsc",
     "watch": "tsc --watch",
     "fmt": "prettier --ignore-path .gitignore --write '**/*.ts'",

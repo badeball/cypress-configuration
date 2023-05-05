@@ -1,6 +1,6 @@
 import { isString } from "./type-guards";
 
-import { homepage } from "../package.json";
+const homepage = "https://github.com/badeball/cypress-configuration";
 
 export function fail(message: string) {
   throw new Error(

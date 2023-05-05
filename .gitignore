@@ -1,5 +1,4 @@
-**/*.js
-**/*.d.ts
+dist/
 
 # Temporary directory for test execution
 tmp/
