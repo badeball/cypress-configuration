@@ -9,6 +9,7 @@ export interface TestConfiguration {
 
 export interface ConfigurationFile {
   e2e?: TestConfiguration;
+  component?: TestConfiguration;
 }
 
 function parseEnv(object: ObjectExpression): Record<string, string> {
@@ -70,20 +71,23 @@ function parseTestingTypeObject(object: ObjectExpression): TestConfiguration {
 }
 
 function parseTestingTypesObject(object: ObjectExpression): ConfigurationFile {
+  const types: ConfigurationFile = {};
+
   for (const property of object.properties) {
     if (
       property.type === "ObjectProperty" &&
       property.key.type === "Identifier" &&
-      property.key.name === "e2e" &&
       property.value.type === "ObjectExpression"
     ) {
-      return {
-        e2e: parseTestingTypeObject(property.value),
-      };
+      if (property.key.name === "e2e") {
+        types.e2e = parseTestingTypeObject(property.value);
+      } else if (property.key.name === "component") {
+        types.component = parseTestingTypeObject(property.value);
+      }
     }
   }
 
-  return {};
+  return types;
 }
 
 export function parsePost10Configuration(source: string): ConfigurationFile {

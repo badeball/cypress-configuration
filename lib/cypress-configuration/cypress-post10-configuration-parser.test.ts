@@ -16,60 +16,85 @@ function example(source: string, expected: ConfigurationFile) {
 }
 
 describe("parsePost10Configuration()", () => {
-  example("module.exports = { e2e: { specPattern: 'foo/bar' } };", {
-    e2e: { specPattern: "foo/bar" },
-  });
+  for (const testingType of ["e2e", "component"]) {
+    describe(testingType, () => {
+      example(
+        `module.exports = { ${testingType}: { specPattern: 'foo/bar' } };`,
+        {
+          [testingType]: { specPattern: "foo/bar" },
+        }
+      );
 
-  example("module.exports = { e2e: { specPattern: ['foo/bar'] } };", {
-    e2e: { specPattern: ["foo/bar"] },
-  });
+      example(
+        `module.exports = { ${testingType}: { specPattern: ['foo/bar'] } };`,
+        {
+          [testingType]: { specPattern: ["foo/bar"] },
+        }
+      );
 
-  example("module.exports = { e2e: { env: { foo: 'bar' } } };", {
-    e2e: { env: { foo: "bar" } },
-  });
+      example(`module.exports = { ${testingType}: { env: { foo: 'bar' } } };`, {
+        [testingType]: { env: { foo: "bar" } },
+      });
 
-  example(
-    "module.exports = defineConfig({ e2e: { specPattern: 'foo/bar' } });",
-    {
-      e2e: { specPattern: "foo/bar" },
-    }
-  );
+      example(
+        `module.exports = defineConfig({ ${testingType}: { specPattern: 'foo/bar' } });`,
+        {
+          [testingType]: { specPattern: "foo/bar" },
+        }
+      );
 
-  example(
-    "module.exports = defineConfig({ e2e: { specPattern: ['foo/bar'] } });",
-    {
-      e2e: { specPattern: ["foo/bar"] },
-    }
-  );
+      example(
+        `module.exports = defineConfig({ ${testingType}: { specPattern: ['foo/bar'] } });`,
+        {
+          [testingType]: { specPattern: ["foo/bar"] },
+        }
+      );
 
-  example("module.exports = defineConfig({ e2e: { env: { foo: 'bar' } } });", {
-    e2e: { env: { foo: "bar" } },
-  });
+      example(
+        `module.exports = defineConfig({ ${testingType}: { env: { foo: 'bar' } } });`,
+        {
+          [testingType]: { env: { foo: "bar" } },
+        }
+      );
 
-  example("export default { e2e: { specPattern: 'foo/bar' } };", {
-    e2e: { specPattern: "foo/bar" },
-  });
+      example(
+        `export default { ${testingType}: { specPattern: 'foo/bar' } };`,
+        {
+          [testingType]: { specPattern: "foo/bar" },
+        }
+      );
 
-  example("export default { e2e: { specPattern: ['foo/bar'] } };", {
-    e2e: { specPattern: ["foo/bar"] },
-  });
+      example(
+        `export default { ${testingType}: { specPattern: ['foo/bar'] } };`,
+        {
+          [testingType]: { specPattern: ["foo/bar"] },
+        }
+      );
 
-  example("export default { e2e: { env: { foo: 'bar' } } };", {
-    e2e: { env: { foo: "bar" } },
-  });
+      example(`export default { ${testingType}: { env: { foo: 'bar' } } };`, {
+        [testingType]: { env: { foo: "bar" } },
+      });
 
-  example("export default defineConfig({ e2e: { specPattern: 'foo/bar' } });", {
-    e2e: { specPattern: "foo/bar" },
-  });
+      example(
+        `export default defineConfig({ ${testingType}: { specPattern: 'foo/bar' } });`,
+        {
+          [testingType]: { specPattern: "foo/bar" },
+        }
+      );
 
-  example(
-    "export default defineConfig({ e2e: { specPattern: ['foo/bar'] } });",
-    {
-      e2e: { specPattern: ["foo/bar"] },
-    }
-  );
+      example(
+        `export default defineConfig({ ${testingType}: { specPattern: ['foo/bar'] } });`,
+        {
+          [testingType]: { specPattern: ["foo/bar"] },
+        }
+      );
 
-  example("export default defineConfig({ e2e: { env: { foo: 'bar' } } });", {
-    e2e: { env: { foo: "bar" } },
-  });
+      example(
+        `export default defineConfig({ ${testingType}: { env: { foo: 'bar' } } });`,
+        {
+          [testingType]: { env: { foo: "bar" } },
+        }
+      );
+    });
+  }
 });
