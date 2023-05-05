@@ -22,7 +22,10 @@ import {
 
 import { ensureIsAbsolute } from "../path-helpers";
 
-import { parsePost10Configuration } from "./cypress-post10-configuration-parser";
+import {
+  ConfigurationFile,
+  parsePost10Configuration,
+} from "./cypress-post10-configuration-parser";
 
 import {
   combine,
@@ -164,7 +167,7 @@ export function resolvePost10Configuration(options: {
       parseConfigurationFile(
         cypressConfigPath,
         options.parseDangerously ?? false
-      )
+      ).e2e ?? {}
     ).map((entry) => validateConfigurationEntry(...entry))
   );
 
@@ -233,7 +236,7 @@ function findConfigurationInFS(options: {
 function parseConfigurationFile(
   configFile: string,
   parseDangerously: boolean
-): Partial<ICypressPost10Configuration> {
+): ConfigurationFile {
   if (parseDangerously) {
     return parseConfigurationFileDangerously(configFile);
   } else {
@@ -243,7 +246,7 @@ function parseConfigurationFile(
 
 function parseConfigurationFileDangerously(
   configFile: string
-): Partial<ICypressPost10Configuration> {
+): ConfigurationFile {
   if (!fs.existsSync(configFile)) {
     throw new MissingConfigurationFileError(
       "Missing Cypress configuration file."
@@ -279,7 +282,7 @@ function parseConfigurationFileDangerously(
 
   hook.unhook(extension);
 
-  return (result.default ?? result).e2e;
+  return result.default ?? result;
 }
 
 export function resolvePost10TestFiles(

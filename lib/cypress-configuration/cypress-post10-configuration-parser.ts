@@ -2,11 +2,50 @@ import { parse } from "@babel/parser";
 
 import { ObjectExpression } from "@babel/types";
 
-import { ICypressPost10Configuration } from "./cypress-post10-configuration";
+export interface TestConfiguration {
+  specPattern?: string | string[];
+}
 
-function parseThatObject(
-  object: ObjectExpression
-): Partial<ICypressPost10Configuration> | undefined {
+export interface ConfigurationFile {
+  e2e?: TestConfiguration;
+}
+
+function parseTestingTypeObject(object: ObjectExpression): TestConfiguration {
+  const test: TestConfiguration = {};
+
+  for (const property of object.properties) {
+    if (
+      property.type === "ObjectProperty" &&
+      property.key.type === "Identifier"
+    ) {
+      if (property.key.name === "specPattern") {
+        if (property.value.type === "StringLiteral") {
+          test.specPattern = property.value.value;
+        } else if (property.value.type === "ArrayExpression") {
+          test.specPattern = property.value.elements.map((element) => {
+            if (element && element.type === "StringLiteral") {
+              return element.value;
+            } else {
+              throw new Error(
+                "Expected a string literal for specPattern.[], but got " +
+                  element?.type ?? "null"
+              );
+            }
+          });
+        } else {
+          throw new Error(
+            "Expected a string literal for specPattern, but got " +
+              property.value.type
+          );
+        }
+      }
+    }
+  }
+
+  return test;
+}
+
+function parseTestingTypesObject(object: ObjectExpression): ConfigurationFile {
   for (const property of object.properties) {
     if (
       property.type === "ObjectProperty" &&
@@ -14,56 +53,16 @@ function parseThatObject(
       property.key.name === "e2e" &&
       property.value.type === "ObjectExpression"
     ) {
-      return Object.fromEntries(
-        property.value.properties.reduce<[string, string | string[]][]>(
-          (entries, property) => {
-            if (
-              property.type === "ObjectProperty" &&
-              property.key.type === "Identifier"
-            ) {
-              if (property.key.name === "specPattern") {
-                if (property.value.type === "StringLiteral") {
-                  return [...entries, ["specPattern", property.value.value]];
-                } else if (property.value.type === "ArrayExpression") {
-                  return [
-                    ...entries,
-                    [
-                      "specPattern",
-                      property.value.elements.map((element) => {
-                        if (element && element.type === "StringLiteral") {
-                          return element.value;
-                        } else {
-                          throw new Error(
-                            "Expected a string literal for specPattern.[], but got " +
-                              element?.type ?? "null"
-                          );
-                        }
-                      }),
-                    ],
-                  ];
-                } else {
-                  throw new Error(
-                    "Expected a string literal for specPattern, but got " +
-                      property.value.type
-                  );
-                }
-              } else {
-                return entries;
-              }
-            } else {
-              return entries;
-            }
-          },
-          []
-        )
-      );
+      return {
+        e2e: parseTestingTypeObject(property.value),
+      };
     }
   }
+
+  return {};
 }
 
-export function parsePost10Configuration(
-  source: string
-): Partial<ICypressPost10Configuration> {
+export function parsePost10Configuration(source: string): ConfigurationFile {
   const ast = parse(source, {
     sourceType: "unambiguous",
     plugins: ["typescript"],
@@ -91,7 +90,7 @@ export function parsePost10Configuration(
             const { right } = expression;
 
             if (right.type === "ObjectExpression") {
-              const result = parseThatObject(right);
+              const result = parseTestingTypesObject(right);
 
               if (result) {
                 return result;
@@ -135,7 +134,7 @@ export function parsePost10Configuration(
                 callee.name === "defineConfig"
               ) {
                 if (argument && argument.type === "ObjectExpression") {
-                  const result = parseThatObject(argument);
+                  const result = parseTestingTypesObject(argument);
 
                   if (result) {
                     return result;
@@ -159,7 +158,7 @@ export function parsePost10Configuration(
         const { declaration } = statement;
 
         if (declaration.type === "ObjectExpression") {
-          const result = parseThatObject(declaration);
+          const result = parseTestingTypesObject(declaration);
 
           if (result) {
             return result;
@@ -186,7 +185,7 @@ export function parsePost10Configuration(
 
           if (callee.type === "Identifier" && callee.name === "defineConfig") {
             if (argument && argument.type === "ObjectExpression") {
-              const result = parseThatObject(argument);
+              const result = parseTestingTypesObject(argument);
 
               if (result) {
                 return result;

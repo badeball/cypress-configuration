@@ -2,58 +2,58 @@ import assert from "assert/strict";
 
 import { ICypressPost10Configuration } from "./cypress-post10-configuration";
 
-import { parsePost10Configuration } from "./cypress-post10-configuration-parser";
+import {
+  ConfigurationFile,
+  parsePost10Configuration,
+} from "./cypress-post10-configuration-parser";
 
 let examples = 1;
 
-function example(
-  source: string,
-  expected: Partial<ICypressPost10Configuration>
-) {
+function example(source: string, expected: ConfigurationFile) {
   it(`example #${examples++}`, () => {
-    assert.deepEqual(parsePost10Configuration(source), expected);
+    assert.deepStrictEqual(parsePost10Configuration(source), expected);
   });
 }
 
 describe("parsePost10Configuration()", () => {
   example("module.exports = { e2e: { specPattern: 'foo/bar' } };", {
-    specPattern: "foo/bar",
+    e2e: { specPattern: "foo/bar" },
   });
 
   example("module.exports = { e2e: { specPattern: ['foo/bar'] } };", {
-    specPattern: ["foo/bar"],
+    e2e: { specPattern: ["foo/bar"] },
   });
 
   example(
     "module.exports = defineConfig({ e2e: { specPattern: 'foo/bar' } });",
     {
-      specPattern: "foo/bar",
+      e2e: { specPattern: "foo/bar" },
     }
   );
 
   example(
     "module.exports = defineConfig({ e2e: { specPattern: ['foo/bar'] } });",
     {
-      specPattern: ["foo/bar"],
+      e2e: { specPattern: ["foo/bar"] },
     }
   );
 
   example("export default { e2e: { specPattern: 'foo/bar' } };", {
-    specPattern: "foo/bar",
+    e2e: { specPattern: "foo/bar" },
   });
 
   example("export default { e2e: { specPattern: ['foo/bar'] } };", {
-    specPattern: ["foo/bar"],
+    e2e: { specPattern: ["foo/bar"] },
   });
 
   example("export default defineConfig({ e2e: { specPattern: 'foo/bar' } });", {
-    specPattern: "foo/bar",
+    e2e: { specPattern: "foo/bar" },
   });
 
   example(
     "export default defineConfig({ e2e: { specPattern: ['foo/bar'] } });",
     {
-      specPattern: ["foo/bar"],
+      e2e: { specPattern: ["foo/bar"] },
     }
   );
 });
