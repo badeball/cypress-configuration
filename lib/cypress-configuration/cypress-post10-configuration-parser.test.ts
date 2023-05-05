@@ -18,37 +18,67 @@ function example(source: string, expected: ConfigurationFile) {
 describe("parsePost10Configuration()", () => {
   for (const testingType of ["e2e", "component"]) {
     describe(testingType, () => {
-      example(
-        `module.exports = { ${testingType}: { specPattern: 'foo/bar' } };`,
-        {
-          [testingType]: { specPattern: "foo/bar" },
-        }
-      );
+      for (const property of ["specPattern", "excludeSpecPattern"] as const) {
+        example(
+          `module.exports = { ${testingType}: { ${property}: 'foo/bar' } };`,
+          {
+            [testingType]: { [property]: "foo/bar" },
+          }
+        );
 
-      example(
-        `module.exports = { ${testingType}: { specPattern: ['foo/bar'] } };`,
-        {
-          [testingType]: { specPattern: ["foo/bar"] },
-        }
-      );
+        example(
+          `module.exports = { ${testingType}: { ${property}: ['foo/bar'] } };`,
+          {
+            [testingType]: { [property]: ["foo/bar"] },
+          }
+        );
+
+        example(
+          `module.exports = defineConfig({ ${testingType}: { ${property}: 'foo/bar' } });`,
+          {
+            [testingType]: { [property]: "foo/bar" },
+          }
+        );
+
+        example(
+          `module.exports = defineConfig({ ${testingType}: { ${property}: ['foo/bar'] } });`,
+          {
+            [testingType]: { [property]: ["foo/bar"] },
+          }
+        );
+
+        example(
+          `export default { ${testingType}: { ${property}: 'foo/bar' } };`,
+          {
+            [testingType]: { [property]: "foo/bar" },
+          }
+        );
+
+        example(
+          `export default { ${testingType}: { ${property}: ['foo/bar'] } };`,
+          {
+            [testingType]: { [property]: ["foo/bar"] },
+          }
+        );
+
+        example(
+          `export default defineConfig({ ${testingType}: { ${property}: 'foo/bar' } });`,
+          {
+            [testingType]: { [property]: "foo/bar" },
+          }
+        );
+
+        example(
+          `export default defineConfig({ ${testingType}: { ${property}: ['foo/bar'] } });`,
+          {
+            [testingType]: { [property]: ["foo/bar"] },
+          }
+        );
+      }
 
       example(`module.exports = { ${testingType}: { env: { foo: 'bar' } } };`, {
         [testingType]: { env: { foo: "bar" } },
       });
-
-      example(
-        `module.exports = defineConfig({ ${testingType}: { specPattern: 'foo/bar' } });`,
-        {
-          [testingType]: { specPattern: "foo/bar" },
-        }
-      );
-
-      example(
-        `module.exports = defineConfig({ ${testingType}: { specPattern: ['foo/bar'] } });`,
-        {
-          [testingType]: { specPattern: ["foo/bar"] },
-        }
-      );
 
       example(
         `module.exports = defineConfig({ ${testingType}: { env: { foo: 'bar' } } });`,
@@ -57,37 +87,9 @@ describe("parsePost10Configuration()", () => {
         }
       );
 
-      example(
-        `export default { ${testingType}: { specPattern: 'foo/bar' } };`,
-        {
-          [testingType]: { specPattern: "foo/bar" },
-        }
-      );
-
-      example(
-        `export default { ${testingType}: { specPattern: ['foo/bar'] } };`,
-        {
-          [testingType]: { specPattern: ["foo/bar"] },
-        }
-      );
-
       example(`export default { ${testingType}: { env: { foo: 'bar' } } };`, {
         [testingType]: { env: { foo: "bar" } },
       });
-
-      example(
-        `export default defineConfig({ ${testingType}: { specPattern: 'foo/bar' } });`,
-        {
-          [testingType]: { specPattern: "foo/bar" },
-        }
-      );
-
-      example(
-        `export default defineConfig({ ${testingType}: { specPattern: ['foo/bar'] } });`,
-        {
-          [testingType]: { specPattern: ["foo/bar"] },
-        }
-      );
 
       example(
         `export default defineConfig({ ${testingType}: { env: { foo: 'bar' } } });`,

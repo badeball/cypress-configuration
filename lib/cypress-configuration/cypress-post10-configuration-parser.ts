@@ -4,6 +4,7 @@ import { ObjectExpression } from "@babel/types";
 
 export interface TestConfiguration {
   specPattern?: string | string[];
+  excludeSpecPattern?: string | string[];
   env?: Record<string, any>;
 }
 
@@ -34,24 +35,29 @@ function parseTestingTypeObject(object: ObjectExpression): TestConfiguration {
       property.type === "ObjectProperty" &&
       property.key.type === "Identifier"
     ) {
-      if (property.key.name === "specPattern") {
+      if (
+        property.key.name === "specPattern" ||
+        property.key.name === "excludeSpecPattern"
+      ) {
+        const propertyName = property.key.name;
+
         if (property.value.type === "StringLiteral") {
-          test.specPattern = property.value.value;
+          test[propertyName] = property.value.value;
         } else if (property.value.type === "ArrayExpression") {
-          test.specPattern = property.value.elements.map((element) => {
+          test[propertyName] = property.value.elements.map((element) => {
             if (element && element.type === "StringLiteral") {
               return element.value;
             } else {
               throw new Error(
-                "Expected a string literal for specPattern.[], but got " +
+                `Expected a string literal for ${propertyName}.[], but got ${
                   element?.type ?? "null"
+                }`
               );
             }
           });
         } else {
           throw new Error(
-            "Expected a string literal for specPattern, but got " +
-              property.value.type
+            `Expected a string literal for ${propertyName}, but got ${property.value.type}`
           );
         }
       } else if (property.key.name === "env") {
