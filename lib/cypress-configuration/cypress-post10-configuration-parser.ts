@@ -4,10 +4,25 @@ import { ObjectExpression } from "@babel/types";
 
 export interface TestConfiguration {
   specPattern?: string | string[];
+  env?: Record<string, any>;
 }
 
 export interface ConfigurationFile {
   e2e?: TestConfiguration;
+}
+
+function parseEnv(object: ObjectExpression): Record<string, string> {
+  return object.properties.reduce<Record<string, string>>((env, property) => {
+    if (
+      property.type === "ObjectProperty" &&
+      property.key.type === "Identifier" &&
+      property.value.type == "StringLiteral"
+    ) {
+      env[property.key.name] = property.value.value;
+    }
+
+    return env;
+  }, {});
 }
 
 function parseTestingTypeObject(object: ObjectExpression): TestConfiguration {
@@ -35,6 +50,15 @@ function parseTestingTypeObject(object: ObjectExpression): TestConfiguration {
         } else {
           throw new Error(
             "Expected a string literal for specPattern, but got " +
+              property.value.type
+          );
+        }
+      } else if (property.key.name === "env") {
+        if (property.value.type === "ObjectExpression") {
+          test.env = parseEnv(property.value);
+        } else {
+          throw new Error(
+            "Expected a ObjectExpression for e2e, but got " +
               property.value.type
           );
         }

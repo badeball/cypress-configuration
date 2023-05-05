@@ -34,9 +34,9 @@ function example(
   attribute: string,
   expected: any
 ) {
-  it(`should return ${attribute} = "${expected}" for ${util.inspect(
-    options
-  )}}`, () => {
+  it(`should return ${attribute} = "${util.inspect(
+    expected
+  )}" for ${util.inspect(options)}}`, () => {
     const {
       cypressConfig = "module.exports = {};",
       cypressConfigPath = "cypress.config.js",
@@ -72,7 +72,7 @@ function example(
       ...options,
     });
 
-    assert.strictEqual(actual[attribute], expected);
+    assert.deepStrictEqual(actual[attribute], expected);
   });
 }
 
@@ -457,5 +457,316 @@ describe("resolvePost10Configuration()", () => {
     },
     "specPattern",
     "foo/bar"
+  );
+
+  /**
+   * Environment part starts here.
+   */
+  example(resolvePost10Configuration, {}, "env", {});
+
+  // Simple CLI override
+  example(
+    resolvePost10Configuration,
+    {
+      argv: ["--env", "FOO=foo"],
+    },
+    "env",
+    { FOO: "foo" }
+  );
+  example(
+    resolvePost10Configuration,
+    {
+      argv: ["--env=FOO=foo"],
+    },
+    "env",
+    { FOO: "foo" }
+  );
+  example(
+    resolvePost10Configuration,
+    {
+      argv: ["-e", "FOO=foo"],
+    },
+    "env",
+    { FOO: "foo" }
+  );
+
+  // CLI override with preceding, comma-delimited configuration
+  example(
+    resolvePost10Configuration,
+    {
+      argv: ["--env", "BAR=bar,FOO=foo"],
+    },
+    "env",
+    { FOO: "foo", BAR: "bar" }
+  );
+  example(
+    resolvePost10Configuration,
+    {
+      argv: ["--env=BAR=bar,FOO=foo"],
+    },
+    "env",
+    { FOO: "foo", BAR: "bar" }
+  );
+  example(
+    resolvePost10Configuration,
+    {
+      argv: ["-e", "BAR=bar,FOO=foo"],
+    },
+    "env",
+    { FOO: "foo", BAR: "bar" }
+  );
+
+  // CLI override with succeeding, comma-delimited configuration
+  example(
+    resolvePost10Configuration,
+    {
+      argv: ["--env", "FOO=foo,BAR=bar"],
+    },
+    "env",
+    { FOO: "foo", BAR: "bar" }
+  );
+  example(
+    resolvePost10Configuration,
+    {
+      argv: ["--env=FOO=foo,BAR=bar"],
+    },
+    "env",
+    { FOO: "foo", BAR: "bar" }
+  );
+  example(
+    resolvePost10Configuration,
+    {
+      argv: ["-e", "FOO=foo,BAR=bar"],
+    },
+    "env",
+    { FOO: "foo", BAR: "bar" }
+  );
+
+  // CLI override with last match taking precedence
+  example(
+    resolvePost10Configuration,
+    {
+      argv: ["--env", "FOO=baz", "--env", "FOO=foo"],
+    },
+    "env",
+    { FOO: "foo" }
+  );
+  example(
+    resolvePost10Configuration,
+    {
+      argv: ["--env=FOO=baz", "--env=FOO=foo"],
+    },
+    "env",
+    { FOO: "foo" }
+  );
+  example(
+    resolvePost10Configuration,
+    {
+      argv: ["-e", "FOO=baz", "-e", "FOO=foo"],
+    },
+    "env",
+    { FOO: "foo" }
+  );
+  example(
+    resolvePost10Configuration,
+    {
+      argv: ["--env", "FOO=foo", "--env", "BAR=bar"],
+    },
+    "env",
+    { BAR: "bar" }
+  );
+
+  {
+    const envTestMatrix: {
+      env: Record<string, string>;
+      expected: Record<string, string>;
+    }[] = [
+      {
+        env: {
+          CYPRESS_FOO: "foo",
+        },
+        expected: { FOO: "foo" },
+      },
+      {
+        env: {
+          cypress_FOO: "foo",
+        },
+        expected: { FOO: "foo" },
+      },
+      {
+        env: {
+          CYPRESS_foo: "foo",
+        },
+        expected: { foo: "foo" },
+      },
+      {
+        env: {
+          cypress_foo: "foo",
+        },
+        expected: { foo: "foo" },
+      },
+    ];
+
+    for (let { env, expected } of envTestMatrix) {
+      example(
+        resolvePost10Configuration,
+        {
+          env,
+        },
+        "env",
+        expected
+      );
+    }
+  }
+
+  // Override with cypress.config.js
+  example(
+    resolvePost10Configuration,
+    {
+      cypressConfig: "module.exports = { e2e: { env: { FOO: 'foo' } } };",
+    },
+    "env",
+    { FOO: "foo" }
+  );
+
+  // Override with cypress.config.js in custom location
+  example(
+    resolvePost10Configuration,
+    {
+      argv: ["--config-file", "foo.js"],
+      cypressConfig: "module.exports = { e2e: { env: { FOO: 'foo' } } };",
+      cypressConfigPath: "foo.js",
+    },
+    "env",
+    { FOO: "foo" }
+  );
+  example(
+    resolvePost10Configuration,
+    {
+      argv: ["--config-file=foo.js"],
+      cypressConfig: "module.exports = { e2e: { env: { FOO: 'foo' } } };",
+      cypressConfigPath: "foo.js",
+    },
+    "env",
+    { FOO: "foo" }
+  );
+  example(
+    resolvePost10Configuration,
+    {
+      argv: ["-C", "foo.js"],
+      cypressConfig: "module.exports = { e2e: { env: { FOO: 'foo' } } };",
+      cypressConfigPath: "foo.js",
+    },
+    "env",
+    { FOO: "foo" }
+  );
+
+  // Override with cypress.env.json
+  example(
+    resolvePost10Configuration,
+    {
+      cypressEnvConfig: { FOO: "foo" },
+    },
+    "env",
+    { FOO: "foo" }
+  );
+
+  // Override with cypress.config.js & custom project path.
+  example(
+    resolvePost10Configuration,
+    {
+      argv: ["--project", "foo"],
+      cypressConfig: "module.exports = { e2e: { env: { FOO: 'foo' } } };",
+      cypressProjectPath: "foo",
+    },
+    "env",
+    { FOO: "foo" }
+  );
+  example(
+    resolvePost10Configuration,
+    {
+      argv: ["--project=foo"],
+      cypressConfig: "module.exports = { e2e: { env: { FOO: 'foo' } } };",
+      cypressProjectPath: "foo",
+    },
+    "env",
+    { FOO: "foo" }
+  );
+  example(
+    resolvePost10Configuration,
+    {
+      argv: ["-P", "foo"],
+      cypressConfig: "module.exports = { e2e: { env: { FOO: 'foo' } } };",
+      cypressProjectPath: "foo",
+    },
+    "env",
+    { FOO: "foo" }
+  );
+
+  // Override with cypress.config.js in custom location & custom project path.
+  example(
+    resolvePost10Configuration,
+    {
+      argv: ["--project", "foo", "--config-file", "foo.js"],
+      cypressConfig: "module.exports = { e2e: { env: { FOO: 'foo' } } };",
+      cypressConfigPath: "foo.js",
+      cypressProjectPath: "foo",
+    },
+    "env",
+    { FOO: "foo" }
+  );
+  example(
+    resolvePost10Configuration,
+    {
+      argv: ["--project=foo", "--config-file", "foo.js"],
+      cypressConfig: "module.exports = { e2e: { env: { FOO: 'foo' } } };",
+      cypressConfigPath: "foo.js",
+      cypressProjectPath: "foo",
+    },
+    "env",
+    { FOO: "foo" }
+  );
+  example(
+    resolvePost10Configuration,
+    {
+      argv: ["-P", "foo", "--config-file", "foo.js"],
+      cypressConfig: "module.exports = { e2e: { env: { FOO: 'foo' } } };",
+      cypressConfigPath: "foo.js",
+      cypressProjectPath: "foo",
+    },
+    "env",
+    { FOO: "foo" }
+  );
+
+  // Override with cypress.env.json & custom project path.
+  example(
+    resolvePost10Configuration,
+    {
+      argv: ["--project", "foo"],
+      cypressEnvConfig: { FOO: "foo" },
+      cypressProjectPath: "foo",
+    },
+    "env",
+    { FOO: "foo" }
+  );
+  example(
+    resolvePost10Configuration,
+    {
+      argv: ["--project=foo"],
+      cypressEnvConfig: { FOO: "foo" },
+      cypressProjectPath: "foo",
+    },
+    "env",
+    { FOO: "foo" }
+  );
+  example(
+    resolvePost10Configuration,
+    {
+      argv: ["-P", "foo"],
+      cypressEnvConfig: { FOO: "foo" },
+      cypressProjectPath: "foo",
+    },
+    "env",
+    { FOO: "foo" }
   );
 });

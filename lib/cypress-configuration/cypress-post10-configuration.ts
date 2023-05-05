@@ -58,6 +58,10 @@ function isStringEntry(entry: [any, any]): entry is [string, string] {
   return typeof entry[0] === "string" && typeof entry[1] === "string";
 }
 
+function isPlainObject(value: any): value is object {
+  return value?.constructor === Object;
+}
+
 function validateConfigurationEntry(
   key: string,
   value: unknown
@@ -85,6 +89,13 @@ function validateConfigurationEntry(
           `Expected a string or array of strings (excludeSpecPattern), but got ${util.inspect(
             value
           )}`
+        );
+      }
+      return { [key]: value };
+    case "env":
+      if (!isPlainObject(value)) {
+        throw new Error(
+          `Expected a plain object (env), but got ${util.inspect(value)}`
         );
       }
       return { [key]: value };

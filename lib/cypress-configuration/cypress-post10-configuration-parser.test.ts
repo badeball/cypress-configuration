@@ -24,6 +24,10 @@ describe("parsePost10Configuration()", () => {
     e2e: { specPattern: ["foo/bar"] },
   });
 
+  example("module.exports = { e2e: { env: { foo: 'bar' } } };", {
+    e2e: { env: { foo: "bar" } },
+  });
+
   example(
     "module.exports = defineConfig({ e2e: { specPattern: 'foo/bar' } });",
     {
@@ -38,12 +42,20 @@ describe("parsePost10Configuration()", () => {
     }
   );
 
+  example("module.exports = defineConfig({ e2e: { env: { foo: 'bar' } } });", {
+    e2e: { env: { foo: "bar" } },
+  });
+
   example("export default { e2e: { specPattern: 'foo/bar' } };", {
     e2e: { specPattern: "foo/bar" },
   });
 
   example("export default { e2e: { specPattern: ['foo/bar'] } };", {
     e2e: { specPattern: ["foo/bar"] },
+  });
+
+  example("export default { e2e: { env: { foo: 'bar' } } };", {
+    e2e: { env: { foo: "bar" } },
   });
 
   example("export default defineConfig({ e2e: { specPattern: 'foo/bar' } });", {
@@ -56,4 +68,8 @@ describe("parsePost10Configuration()", () => {
       e2e: { specPattern: ["foo/bar"] },
     }
   );
+
+  example("export default defineConfig({ e2e: { env: { foo: 'bar' } } });", {
+    e2e: { env: { foo: "bar" } },
+  });
 });
