@@ -34,11 +34,11 @@ import {
   findArgumentValue,
   resolveProjectPath,
 } from "./helpers";
+
 import {
   MissingConfigurationFileError,
   MultipleConfigurationFilesError,
 } from "./errors";
-import { resolvePre10Environment } from "./cypress-pre10-configuration";
 
 export const CONFIG_FILE_NAMES = [
   "cypress.config.js",
@@ -204,6 +204,88 @@ export function resolvePost10Configuration(options: {
       configOrigin: configuration.env,
     }),
   };
+}
+
+function resolvePre10Environment(options: {
+  argv: string[];
+  env: NodeJS.ProcessEnv;
+  cwd: string;
+  projectPath: string;
+  configOrigin: Record<string, any>;
+}): Record<string, any> {
+  debug(
+    `attempting to resolve Cypress environment using ${util.inspect(options)}`
+  );
+
+  const { argv, env, projectPath, configOrigin } = options;
+
+  const envEntries = Array.from(
+    combine(
+      traverseArgvMatching(argv, "--env", true),
+      traverseArgvMatching(argv, "-e", false)
+    )
+  );
+
+  if (envEntries.length > 1) {
+    console.warn(
+      "You have specified -e / --env multiple times. This is likely a mistake, as only the last one will take affect. Multiple values should instead be comma-separated."
+    );
+  }
+
+  const cliOrigin: Record<string, string> = Object.fromEntries(
+    envEntries.slice(0, 1).flatMap((argument) => {
+      const keypairExpr = /(?:^|,)([^=]+)=([^,$]+)/g;
+      const entries: [string, string][] = [];
+      let match;
+
+      while ((match = keypairExpr.exec(argument)) !== null) {
+        entries.push([match[1], match[2]]);
+      }
+
+      return entries;
+    })
+  );
+
+  const envPrefixExpr = /^cypress_(.+)/i;
+
+  const envOrigin: Record<string, string> = Object.fromEntries(
+    Object.entries(env)
+      .filter((entry) => {
+        return envPrefixExpr.test(entry[0]);
+      })
+      .filter(isStringEntry)
+      .map<[string, string]>((entry) => {
+        const match = entry[0].match(envPrefixExpr);
+
+        assert(match, "expected match after test");
+
+        return [assertAndReturn(match[1]), entry[1]];
+      })
+  );
+
+  const cypressEnvironmentFilePath = path.join(projectPath, "cypress.env.json");
+
+  let cypressEnvOrigin: Record<string, any> = {};
+
+  if (fs.existsSync(cypressEnvironmentFilePath)) {
+    const content = fs
+      .readFileSync(cypressEnvironmentFilePath)
+      .toString("utf8");
+
+    cypressEnvOrigin = JSON.parse(content);
+  }
+
+  const environment = Object.assign(
+    {},
+    cypressEnvOrigin,
+    configOrigin,
+    envOrigin,
+    cliOrigin
+  );
+
+  debug(`resolved environment of ${util.inspect(environment)}`);
+
+  return environment;
 }
 
 function resolveConfigurationFile(options: {

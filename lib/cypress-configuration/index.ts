@@ -9,18 +9,14 @@ import {
   resolvePost10Configuration,
 } from "./cypress-post10-configuration";
 
-import {
-  ICypressPre10Configuration,
-  resolvePre10Configuration,
-  resolvePre10TestFiles,
-  CONFIG_FILE_NAME as PRE10_CONFIG_FILE_NAME,
-} from "./cypress-pre10-configuration";
+import { CONFIG_FILE_NAME as PRE10_CONFIG_FILE_NAME } from "./cypress-pre10-configuration";
 
 import {
   CypressConfigurationError,
   MissingConfigurationFileError,
   MultipleConfigurationFilesError,
   UnrecognizedConfigurationFileError,
+  UnsupportedCypressEra,
 } from "./errors";
 
 import { findArgumentValue, resolveProjectPath } from "./helpers";
@@ -32,13 +28,10 @@ export {
   MissingConfigurationFileError,
   MultipleConfigurationFilesError,
   UnrecognizedConfigurationFileError,
+  UnsupportedCypressEra,
 };
 
-export { ICypressPre10Configuration, ICypressPost10Configuration };
-
-export type ICypressConfiguration =
-  | ICypressPre10Configuration
-  | ICypressPost10Configuration;
+export type ICypressConfiguration = ICypressPost10Configuration;
 
 export enum CypressEra {
   POST_V10,
@@ -112,7 +105,9 @@ export function resolveConfiguration(options: {
   const era = determineCypressEra(options);
 
   if (era === CypressEra.PRE_V10) {
-    return resolvePre10Configuration(options);
+    throw new UnsupportedCypressEra(
+      "Unable resolve configuration of Cypress versions below v10"
+    );
   } else {
     return resolvePost10Configuration(options);
   }
@@ -124,6 +119,8 @@ export function resolveTestFiles(
   if ("specPattern" in configuration) {
     return resolvePost10TestFiles(configuration);
   } else {
-    return resolvePre10TestFiles(configuration);
+    throw new UnsupportedCypressEra(
+      "Unable resolve test files of Cypress versions below v10"
+    );
   }
 }
