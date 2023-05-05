@@ -1,6 +1,7 @@
 export {
   resolveConfiguration as getConfiguration,
   resolveTestFiles as getTestFiles,
+  TestingType,
   ICypressConfiguration,
   CypressConfigurationError,
   MissingConfigurationFileError,

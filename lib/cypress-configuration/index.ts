@@ -7,6 +7,7 @@ import {
   resolvePost10TestFiles,
   CONFIG_FILE_NAMES as POST10_CONFIG_FILE_NAMES,
   resolvePost10Configuration,
+  TestingType,
 } from "./cypress-post10-configuration";
 
 import { CONFIG_FILE_NAME as PRE10_CONFIG_FILE_NAME } from "./cypress-pre10-configuration";
@@ -24,6 +25,7 @@ import { findArgumentValue, resolveProjectPath } from "./helpers";
 import debug from "../debug";
 
 export {
+  TestingType,
   CypressConfigurationError,
   MissingConfigurationFileError,
   MultipleConfigurationFilesError,
@@ -101,6 +103,7 @@ export function resolveConfiguration(options: {
   env: NodeJS.ProcessEnv;
   cwd: string;
   parseDangerously?: boolean;
+  testingType: TestingType;
 }): ICypressConfiguration {
   const era = determineCypressEra(options);
 

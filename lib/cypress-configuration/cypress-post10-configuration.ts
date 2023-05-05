@@ -47,7 +47,10 @@ export const CONFIG_FILE_NAMES = [
   "cypress.config.ts",
 ];
 
+export type TestingType = "e2e" | "component";
+
 export interface ICypressPost10Configuration {
+  testingType: TestingType;
   projectRoot: string;
   specPattern: string | string[];
   excludeSpecPattern: string | string[];
@@ -109,12 +112,13 @@ export function resolvePost10Configuration(options: {
   env: NodeJS.ProcessEnv;
   cwd: string;
   parseDangerously?: boolean;
+  testingType: TestingType;
 }): ICypressPost10Configuration {
   debug(
     `attempting to resolve Cypress configuration using ${util.inspect(options)}`
   );
 
-  const { argv, env } = options;
+  const { argv, env, testingType } = options;
 
   const projectPath = resolveProjectPath(options);
 
@@ -178,16 +182,27 @@ export function resolvePost10Configuration(options: {
       parseConfigurationFile(
         cypressConfigPath,
         options.parseDangerously ?? false
-      ).e2e ?? {}
+      )[testingType] ?? {}
     ).map((entry) => validateConfigurationEntry(...entry))
   );
 
+  const defaults =
+    testingType === "e2e"
+      ? {
+          specPattern: "cypress/e2e/**/*.cy.{js,jsx,ts,tsx}",
+          excludeSpecPattern: "*.hot-update.js",
+        }
+      : {
+          specPattern: "**/*.cy.{js,jsx,ts,tsx}",
+          excludeSpecPattern: ["/snapshots/*", "/image_snapshots/*"],
+        };
+
   const configuration: ICypressPost10Configuration = Object.assign(
     {
+      testingType,
       projectRoot: resolveProjectPath(options),
-      specPattern: "cypress/e2e/**/*.cy.{js,jsx,ts,tsx}",
-      excludeSpecPattern: "*.hot-update.js",
       env: {},
+      ...defaults,
     },
     configOrigin,
     envOrigin,
