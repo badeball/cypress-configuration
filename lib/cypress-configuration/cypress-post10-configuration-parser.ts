@@ -5,6 +5,7 @@ import { ObjectExpression } from "@babel/types";
 export interface TestConfiguration {
   specPattern?: string | string[];
   excludeSpecPattern?: string | string[];
+  reporter?: string;
   env?: Record<string, any>;
 }
 
@@ -55,6 +56,16 @@ function parseTestingTypeObject(object: ObjectExpression): TestConfiguration {
               );
             }
           });
+        } else {
+          throw new Error(
+            `Expected a string literal for ${propertyName}, but got ${property.value.type}`
+          );
+        }
+      } else if (property.key.name === "reporter") {
+        const propertyName = property.key.name;
+
+        if (property.value.type === "StringLiteral") {
+          test[propertyName] = property.value.value;
         } else {
           throw new Error(
             `Expected a string literal for ${propertyName}, but got ${property.value.type}`

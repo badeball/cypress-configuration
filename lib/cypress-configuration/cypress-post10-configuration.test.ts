@@ -91,6 +91,7 @@ describe("resolvePost10Configuration()", () => {
       // Default
       example({ testingType }, "specPattern", defaultSpecPattern);
       example({ testingType }, "excludeSpecPattern", defaultExcludeSpecPattern);
+      example({ testingType }, "reporter", "spec");
 
       // Simple CLI override
       for (const argv of [

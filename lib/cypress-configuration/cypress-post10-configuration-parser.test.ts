@@ -103,6 +103,14 @@ describe("parsePost10Configuration()", () => {
         });
       }
 
+      describe("reporter", () => {
+        example({
+          testingType,
+          property: "reporter",
+          value: "foobar",
+        });
+      });
+
       describe("env", () => {
         example({
           testingType,

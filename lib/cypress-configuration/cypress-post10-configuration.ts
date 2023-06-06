@@ -52,6 +52,7 @@ export type TestingType = "e2e" | "component";
 export interface ICypressPost10Configuration {
   testingType: TestingType;
   projectRoot: string;
+  reporter: string;
   specPattern: string | string[];
   excludeSpecPattern: string | string[];
   env: Record<string, any>;
@@ -189,10 +190,12 @@ export function resolvePost10Configuration(options: {
   const defaults =
     testingType === "e2e"
       ? {
+          reporter: "spec",
           specPattern: "cypress/e2e/**/*.cy.{js,jsx,ts,tsx}",
           excludeSpecPattern: "*.hot-update.js",
         }
       : {
+          reporter: "spec",
           specPattern: "**/*.cy.{js,jsx,ts,tsx}",
           excludeSpecPattern: ["/snapshots/*", "/image_snapshots/*"],
         };
