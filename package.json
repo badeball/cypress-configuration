@@ -29,22 +29,22 @@
     "prepublishOnly": "npm run clean && npm run build && npm run test"
   },
   "dependencies": {
-    "@babel/parser": "^7.18.8",
-    "debug": "^4.3.2",
-    "esbuild": "^0.19.4",
-    "glob": "^7.1.6",
-    "minimatch": "^3.0.4",
+    "@babel/parser": "^7.25.6",
+    "debug": "^4.3.7",
+    "esbuild": "^0.23.1",
+    "glob": "^11.0.0",
+    "minimatch": "^10.0.1",
     "node-hook": "^1.0.0"
   },
   "devDependencies": {
-    "@babel/types": "^7.18.8",
-    "@types/debug": "^4.1.7",
-    "@types/glob": "^7.1.4",
-    "@types/mocha": "^9.0.0",
-    "@types/node-hook": "^1.0.1",
-    "mocha": "^8.2.0",
-    "prettier": "^2.2.1",
-    "ts-node": "^10.3.0",
-    "typescript": "^4.0.3"
+    "@babel/types": "^7.25.6",
+    "@types/debug": "^4.1.12",
+    "@types/glob": "^8.1.0",
+    "@types/mocha": "^10.0.8",
+    "@types/node-hook": "^1.0.3",
+    "mocha": "^10.7.3",
+    "prettier": "^3.3.3",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.6.2"
   }
 }
