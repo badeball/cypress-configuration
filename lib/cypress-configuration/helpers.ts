@@ -5,7 +5,7 @@ import { ensureIsAbsolute } from "../path-helpers";
 export function findLastIndex<T>(
   collection: ArrayLike<T>,
   predicate: (value: T) => boolean,
-  beforeIndex = collection.length
+  beforeIndex = collection.length,
 ): number {
   for (let i = beforeIndex - 1; i >= 0; --i) {
     if (predicate(collection[i])) {
@@ -19,7 +19,7 @@ export function findLastIndex<T>(
 export function* traverseArgvMatching(
   argv: string[],
   name: string,
-  allowEqual: boolean
+  allowEqual: boolean,
 ) {
   let beforeIndex = argv.length,
     matchingIndex;
@@ -28,7 +28,7 @@ export function* traverseArgvMatching(
     (matchingIndex = findLastIndex(
       argv,
       (arg) => arg.startsWith(name),
-      beforeIndex
+      beforeIndex,
     )) !== -1
   ) {
     if (argv[matchingIndex] === name) {
@@ -54,7 +54,7 @@ export function* combine<T>(...generators: Generator<T, unknown, unknown>[]) {
 export function findArgumentValue(
   argv: string[],
   name: string,
-  allowEqual: boolean
+  allowEqual: boolean,
 ): string | undefined {
   for (const value of traverseArgvMatching(argv, name, allowEqual)) {
     return value;
@@ -73,7 +73,7 @@ export function toCamelCase(value: string) {
   return value
     .split("_")
     .map((word, index) =>
-      index === 0 ? word.toLocaleLowerCase() : capitalize(word)
+      index === 0 ? word.toLocaleLowerCase() : capitalize(word),
     )
     .join("");
 }

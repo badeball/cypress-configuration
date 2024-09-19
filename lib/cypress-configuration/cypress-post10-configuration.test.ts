@@ -31,10 +31,10 @@ function example(
     parseDangerously?: boolean;
   },
   attribute: keyof ICypressPost10Configuration,
-  expected: any
+  expected: any,
 ) {
   it(`should return ${attribute} = "${util.inspect(
-    expected
+    expected,
   )}" for ${util.inspect(options)}}`, () => {
     const {
       cypressConfig = "module.exports = {};",
@@ -54,13 +54,13 @@ function example(
 
     fs.writeFileSync(
       path.join(fullCypressProjectPath, cypressConfigPath),
-      cypressConfig
+      cypressConfig,
     );
 
     if (cypressEnvConfig) {
       fs.writeFileSync(
         path.join(fullCypressProjectPath, "cypress.env.json"),
-        JSON.stringify(cypressEnvConfig, null, 2)
+        JSON.stringify(cypressEnvConfig, null, 2),
       );
     }
 
@@ -105,7 +105,7 @@ describe("resolvePost10Configuration()", () => {
             argv,
           },
           "specPattern",
-          "foo/bar"
+          "foo/bar",
         );
       }
 
@@ -121,7 +121,7 @@ describe("resolvePost10Configuration()", () => {
             argv,
           },
           "specPattern",
-          "foo/bar"
+          "foo/bar",
         );
       }
 
@@ -137,7 +137,7 @@ describe("resolvePost10Configuration()", () => {
             argv,
           },
           "specPattern",
-          "foo/bar"
+          "foo/bar",
         );
       }
 
@@ -153,7 +153,7 @@ describe("resolvePost10Configuration()", () => {
             argv,
           },
           "specPattern",
-          "foo/bar"
+          "foo/bar",
         );
       }
 
@@ -217,7 +217,7 @@ describe("resolvePost10Configuration()", () => {
             env,
           },
           "specPattern",
-          expected
+          expected,
         );
       }
 
@@ -229,7 +229,7 @@ describe("resolvePost10Configuration()", () => {
             cypressConfig: `module.exports = { ${testingType}: { specPattern: 'foo/bar' } };`,
           },
           "specPattern",
-          "foo/bar"
+          "foo/bar",
         );
 
         // Override with cypress.config.cjs
@@ -241,7 +241,7 @@ describe("resolvePost10Configuration()", () => {
             cypressConfigPath: "cypress.config.cjs",
           },
           "specPattern",
-          "foo/bar"
+          "foo/bar",
         );
 
         // Override with cypress.config.mjs
@@ -253,7 +253,7 @@ describe("resolvePost10Configuration()", () => {
             cypressConfigPath: "cypress.config.mjs",
           },
           "specPattern",
-          "foo/bar"
+          "foo/bar",
         );
 
         // Override with cypress.config.ts
@@ -265,7 +265,7 @@ describe("resolvePost10Configuration()", () => {
             cypressConfigPath: "cypress.config.ts",
           },
           "specPattern",
-          "foo/bar"
+          "foo/bar",
         );
       });
 
@@ -278,7 +278,7 @@ describe("resolvePost10Configuration()", () => {
             parseDangerously: true,
           },
           "specPattern",
-          "foo/bar"
+          "foo/bar",
         );
 
         // Override with cypress.config.cjs
@@ -291,7 +291,7 @@ describe("resolvePost10Configuration()", () => {
             parseDangerously: true,
           },
           "specPattern",
-          "foo/bar"
+          "foo/bar",
         );
 
         // Override with cypress.config.mjs
@@ -304,7 +304,7 @@ describe("resolvePost10Configuration()", () => {
             parseDangerously: true,
           },
           "specPattern",
-          "foo/bar"
+          "foo/bar",
         );
 
         // Override with cypress.config.ts
@@ -317,7 +317,7 @@ describe("resolvePost10Configuration()", () => {
             parseDangerously: true,
           },
           "specPattern",
-          "foo/bar"
+          "foo/bar",
         );
       });
 
@@ -335,7 +335,7 @@ describe("resolvePost10Configuration()", () => {
             cypressConfigPath: "foo.js",
           },
           "specPattern",
-          "foo/bar"
+          "foo/bar",
         );
       }
 
@@ -353,7 +353,7 @@ describe("resolvePost10Configuration()", () => {
             cypressProjectPath: "foo",
           },
           "specPattern",
-          "foo/bar"
+          "foo/bar",
         );
       }
 
@@ -372,7 +372,7 @@ describe("resolvePost10Configuration()", () => {
             cypressProjectPath: "foo",
           },
           "specPattern",
-          "foo/bar"
+          "foo/bar",
         );
       }
 
@@ -384,7 +384,7 @@ describe("resolvePost10Configuration()", () => {
           testingType,
         },
         "env",
-        {}
+        {},
       );
 
       // Simple CLI override
@@ -399,7 +399,7 @@ describe("resolvePost10Configuration()", () => {
             argv,
           },
           "env",
-          { FOO: "foo" }
+          { FOO: "foo" },
         );
       }
 
@@ -415,7 +415,7 @@ describe("resolvePost10Configuration()", () => {
             argv,
           },
           "env",
-          { FOO: "foo", BAR: "bar" }
+          { FOO: "foo", BAR: "bar" },
         );
       }
 
@@ -431,7 +431,7 @@ describe("resolvePost10Configuration()", () => {
             argv,
           },
           "env",
-          { FOO: "foo" }
+          { FOO: "foo" },
         );
       }
 
@@ -473,7 +473,7 @@ describe("resolvePost10Configuration()", () => {
               env,
             },
             "env",
-            expected
+            expected,
           );
         }
       }
@@ -485,7 +485,7 @@ describe("resolvePost10Configuration()", () => {
           cypressConfig: `module.exports = { ${testingType}: { env: { FOO: 'foo' } } };`,
         },
         "env",
-        { FOO: "foo" }
+        { FOO: "foo" },
       );
 
       // Override with cypress.config.js in custom location
@@ -502,7 +502,7 @@ describe("resolvePost10Configuration()", () => {
             cypressConfigPath: "foo.js",
           },
           "env",
-          { FOO: "foo" }
+          { FOO: "foo" },
         );
       }
 
@@ -513,7 +513,7 @@ describe("resolvePost10Configuration()", () => {
           cypressEnvConfig: { FOO: "foo" },
         },
         "env",
-        { FOO: "foo" }
+        { FOO: "foo" },
       );
 
       // Override with cypress.config.js & custom project path.
@@ -530,7 +530,7 @@ describe("resolvePost10Configuration()", () => {
             cypressProjectPath: "foo",
           },
           "env",
-          { FOO: "foo" }
+          { FOO: "foo" },
         );
       }
 
@@ -549,7 +549,7 @@ describe("resolvePost10Configuration()", () => {
             cypressProjectPath: "foo",
           },
           "env",
-          { FOO: "foo" }
+          { FOO: "foo" },
         );
       }
 
@@ -567,7 +567,7 @@ describe("resolvePost10Configuration()", () => {
             cypressProjectPath: "foo",
           },
           "env",
-          { FOO: "foo" }
+          { FOO: "foo" },
         );
       }
     });

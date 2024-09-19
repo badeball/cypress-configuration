@@ -63,28 +63,28 @@ export function determineCypressEra(options: {
         return CypressEra.POST_V10;
       } else {
         throw new UnrecognizedConfigurationFileError(
-          "Unrecognized file " + name
+          "Unrecognized file " + name,
         );
       }
     } else {
       throw new MissingConfigurationFileError(
-        "Missing Cypress configuration file."
+        "Missing Cypress configuration file.",
       );
     }
   } else {
     const files = fs.readdirSync(projectRoot);
 
     const configFiles = files.filter((file) =>
-      [PRE10_CONFIG_FILE_NAME, ...POST10_CONFIG_FILE_NAMES].includes(file)
+      [PRE10_CONFIG_FILE_NAME, ...POST10_CONFIG_FILE_NAMES].includes(file),
     );
 
     if (configFiles.length === 0) {
       throw new MissingConfigurationFileError(
-        "Unable to find a Cypress configuration file."
+        "Unable to find a Cypress configuration file.",
       );
     } else if (configFiles.length > 1) {
       throw new MultipleConfigurationFilesError(
-        "Found multiple Cypress configuration files."
+        "Found multiple Cypress configuration files.",
       );
     }
 
@@ -109,7 +109,7 @@ export function resolveConfiguration(options: {
 
   if (era === CypressEra.PRE_V10) {
     throw new UnsupportedCypressEra(
-      "Unable resolve configuration of Cypress versions below v10"
+      "Unable resolve configuration of Cypress versions below v10",
     );
   } else {
     return resolvePost10Configuration(options);
@@ -117,13 +117,13 @@ export function resolveConfiguration(options: {
 }
 
 export function resolveTestFiles(
-  configuration: ICypressConfiguration
+  configuration: ICypressConfiguration,
 ): string[] {
   if ("specPattern" in configuration) {
     return resolvePost10TestFiles(configuration);
   } else {
     throw new UnsupportedCypressEra(
-      "Unable resolve test files of Cypress versions below v10"
+      "Unable resolve test files of Cypress versions below v10",
     );
   }
 }

@@ -15,7 +15,7 @@ export function isStringOrFalse(value: unknown): value is string | false {
 }
 
 export function isStringOrStringArray(
-  value: unknown
+  value: unknown,
 ): value is string | string[] {
   return (
     typeof value === "string" || (Array.isArray(value) && value.every(isString))

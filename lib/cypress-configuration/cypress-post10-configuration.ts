@@ -68,13 +68,13 @@ function isPlainObject(value: any): value is object {
 
 function validateConfigurationEntry(
   key: string,
-  value: unknown
+  value: unknown,
 ): Partial<ICypressPost10Configuration> {
   switch (key) {
     case "projectRoot":
       if (!isString(value)) {
         throw new Error(
-          `Expected a string (projectRoot), but got ${util.inspect(value)}`
+          `Expected a string (projectRoot), but got ${util.inspect(value)}`,
         );
       }
       return { [key]: value };
@@ -82,8 +82,8 @@ function validateConfigurationEntry(
       if (!isStringOrStringArray(value)) {
         throw new Error(
           `Expected a string or array of strings (specPattern), but got ${util.inspect(
-            value
-          )}`
+            value,
+          )}`,
         );
       }
       return { [key]: value };
@@ -91,15 +91,15 @@ function validateConfigurationEntry(
       if (!isStringOrStringArray(value)) {
         throw new Error(
           `Expected a string or array of strings (excludeSpecPattern), but got ${util.inspect(
-            value
-          )}`
+            value,
+          )}`,
         );
       }
       return { [key]: value };
     case "env":
       if (!isPlainObject(value)) {
         throw new Error(
-          `Expected a plain object (env), but got ${util.inspect(value)}`
+          `Expected a plain object (env), but got ${util.inspect(value)}`,
         );
       }
       return { [key]: value };
@@ -116,7 +116,7 @@ export function resolvePost10Configuration(options: {
   testingType: TestingType;
 }): ICypressPost10Configuration {
   debug(
-    `attempting to resolve Cypress configuration using ${util.inspect(options)}`
+    `attempting to resolve Cypress configuration using ${util.inspect(options)}`,
   );
 
   const { argv, env, testingType } = options;
@@ -128,8 +128,8 @@ export function resolvePost10Configuration(options: {
     ...Array.from(
       combine(
         traverseArgvMatching(argv, "--config", true),
-        traverseArgvMatching(argv, "-c", false)
-      )
+        traverseArgvMatching(argv, "-c", false),
+      ),
     )
       .reverse()
       .flatMap((argument) => {
@@ -142,7 +142,7 @@ export function resolvePost10Configuration(options: {
         }
 
         return entries;
-      })
+      }),
   );
 
   const envPrefixExpr = /^cypress_(.+)/i;
@@ -159,7 +159,7 @@ export function resolvePost10Configuration(options: {
 
         assert(
           match,
-          "cypress-cucumber-preprocessor: expected match after test, this is likely a bug."
+          "cypress-cucumber-preprocessor: expected match after test, this is likely a bug.",
         );
 
         return [assertAndReturn(match[1]), entry[1]];
@@ -167,14 +167,14 @@ export function resolvePost10Configuration(options: {
       .map((entry) => {
         return validateConfigurationEntry(
           entry[0].includes("_") ? toCamelCase(entry[0]) : entry[0],
-          entry[1]
+          entry[1],
         );
-      })
+      }),
   );
 
   const cypressConfigPath = ensureIsAbsolute(
     projectPath,
-    resolveConfigurationFile(options)
+    resolveConfigurationFile(options),
   );
 
   const configOrigin: Partial<ICypressPost10Configuration> = Object.assign(
@@ -182,9 +182,9 @@ export function resolvePost10Configuration(options: {
     ...Object.entries(
       parseConfigurationFile(
         cypressConfigPath,
-        options.parseDangerously ?? false
-      )[testingType] ?? {}
-    ).map((entry) => validateConfigurationEntry(...entry))
+        options.parseDangerously ?? false,
+      )[testingType] ?? {},
+    ).map((entry) => validateConfigurationEntry(...entry)),
   );
 
   const defaults =
@@ -209,7 +209,7 @@ export function resolvePost10Configuration(options: {
     },
     configOrigin,
     envOrigin,
-    cliOrigin
+    cliOrigin,
   );
 
   debug(`resolved configuration of ${util.inspect(configuration)}`);
@@ -232,7 +232,7 @@ function resolvePre10Environment(options: {
   configOrigin: Record<string, any>;
 }): Record<string, any> {
   debug(
-    `attempting to resolve Cypress environment using ${util.inspect(options)}`
+    `attempting to resolve Cypress environment using ${util.inspect(options)}`,
   );
 
   const { argv, env, projectPath, configOrigin } = options;
@@ -240,13 +240,13 @@ function resolvePre10Environment(options: {
   const envEntries = Array.from(
     combine(
       traverseArgvMatching(argv, "--env", true),
-      traverseArgvMatching(argv, "-e", false)
-    )
+      traverseArgvMatching(argv, "-e", false),
+    ),
   );
 
   if (envEntries.length > 1) {
     console.warn(
-      "You have specified -e / --env multiple times. This is likely a mistake, as only the last one will take affect. Multiple values should instead be comma-separated."
+      "You have specified -e / --env multiple times. This is likely a mistake, as only the last one will take affect. Multiple values should instead be comma-separated.",
     );
   }
 
@@ -261,7 +261,7 @@ function resolvePre10Environment(options: {
       }
 
       return entries;
-    })
+    }),
   );
 
   const envPrefixExpr = /^cypress_(.+)/i;
@@ -278,7 +278,7 @@ function resolvePre10Environment(options: {
         assert(match, "expected match after test");
 
         return [assertAndReturn(match[1]), entry[1]];
-      })
+      }),
   );
 
   const cypressEnvironmentFilePath = path.join(projectPath, "cypress.env.json");
@@ -298,7 +298,7 @@ function resolvePre10Environment(options: {
     cypressEnvOrigin,
     configOrigin,
     envOrigin,
-    cliOrigin
+    cliOrigin,
   );
 
   debug(`resolved environment of ${util.inspect(environment)}`);
@@ -333,11 +333,11 @@ function findConfigurationInFS(options: {
 
   if (configFiles.length === 0) {
     throw new MissingConfigurationFileError(
-      "Unable to find a Cypress configuration file."
+      "Unable to find a Cypress configuration file.",
     );
   } else if (configFiles.length > 1) {
     throw new MultipleConfigurationFilesError(
-      "Found multiple Cypress configuration files."
+      "Found multiple Cypress configuration files.",
     );
   }
 
@@ -346,7 +346,7 @@ function findConfigurationInFS(options: {
 
 function parseConfigurationFile(
   configFile: string,
-  parseDangerously: boolean
+  parseDangerously: boolean,
 ): ConfigurationFile {
   if (parseDangerously) {
     return parseConfigurationFileDangerously(configFile);
@@ -356,11 +356,11 @@ function parseConfigurationFile(
 }
 
 function parseConfigurationFileDangerously(
-  configFile: string
+  configFile: string,
 ): ConfigurationFile {
   if (!fs.existsSync(configFile)) {
     throw new MissingConfigurationFileError(
-      "Missing Cypress configuration file."
+      "Missing Cypress configuration file.",
     );
   }
 
@@ -397,7 +397,7 @@ function parseConfigurationFileDangerously(
 }
 
 export function resolvePost10TestFiles(
-  configuration: ICypressPost10Configuration
+  configuration: ICypressPost10Configuration,
 ): string[] {
   let {
     projectRoot,
@@ -419,6 +419,6 @@ export function resolvePost10TestFiles(
   };
 
   return specPatterns.flatMap((specPattern) =>
-    glob.sync(specPattern, globOptions)
+    glob.sync(specPattern, globOptions),
   );
 }

@@ -73,9 +73,9 @@ function example<T extends keyof TestConfiguration>(options: {
               testingType,
               property,
               value,
-            })
+            }),
           ),
-          expected
+          expected,
         );
       });
     }
